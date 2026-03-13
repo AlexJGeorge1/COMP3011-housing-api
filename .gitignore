@@ -1,0 +1,73 @@
+.env
+
+# Python 
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+
+# Testing 
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+
+# Type checking 
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# IDEs 
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS 
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+# Docker 
+# Keep docker-compose.yml committed; ignore override files
+docker-compose.override.yml
+
+# Data 
+# Raw downloaded datasets 
+data/raw/
+*.csv
+*.zip
+
+# Alembic 
+# Keep migrations committed; ignore local SQLite test databases
+*.db
+*.sqlite3
+
+# Jupyter 
+.ipynb_checkpoints/
+
+# Logs 
+*.log
+logs/
