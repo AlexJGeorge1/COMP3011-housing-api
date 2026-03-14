@@ -33,5 +33,9 @@ def health_check():
 
 
 # ── Routers ───────────────────────────────────────────────────────────────────
+from app.auth import router as auth_router
+
+app.include_router(auth_router)
+
 # Routers are registered here as they are built in subsequent units.
 # from app.routers import listings, regions, affordability, trends, rent_to_buy, search, insights
