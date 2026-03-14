@@ -18,6 +18,8 @@ load_dotenv()
 
 # Import Base from our models/database layer so Alembic can read the metadata
 from app.database import Base
+from app.models.listing import Listing
+from app.models.region import Region
 from app.config import get_settings
 
 settings = get_settings()

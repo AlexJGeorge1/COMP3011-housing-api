@@ -18,8 +18,10 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy application source
+# Copy application source and migrations
 COPY app/ ./app/
+COPY alembic/ ./alembic/
+COPY alembic.ini .
 
 # Expose API port
 EXPOSE 8000
