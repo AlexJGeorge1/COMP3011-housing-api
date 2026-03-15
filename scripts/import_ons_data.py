@@ -1,23 +1,6 @@
 """
-ONS Data Importer
-==================
-Populates the `regions` table with:
-  - ONS Annual Survey of Hours and Earnings (ASHE) — median salary by region
-  - ONS Private Rental Market Summary (PRMS) — median rent by region
-
-ONS provides these as Excel/CSV downloads. This script uses hard-coded
-authoritative 2023 figures (the most recent complete year available).
-
-To update with the latest ONS release, replace the values in the
-SALARY_DATA and RENT_DATA dictionaries below and change DATA_YEAR.
-
-Data sources:
   ASHE: https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/regionbyoccupation4digitsoceasonallyadjusted
   PRS:  https://www.ons.gov.uk/peoplepopulationandcommunity/housing/datasets/privaterentalmarketsummarystatisticsinengland
-
-Usage:
-  python scripts/import_ons_data.py
-  python scripts/import_ons_data.py --dry-run
 """
 
 import argparse

@@ -36,10 +36,12 @@ def health_check():
 from app.auth import router as auth_router
 from app.routers.listings import router as listings_router
 from app.routers.regions import router as regions_router
+from app.routers.affordability import router as affordability_router
 
 app.include_router(auth_router)
 app.include_router(listings_router)
 app.include_router(regions_router)
+app.include_router(affordability_router)
 
 # Routers registered here as they are built in subsequent units.
-# from app.routers import affordability, trends, rent_to_buy, search, insights
+# from app.routers import trends, rent_to_buy, search, insights
