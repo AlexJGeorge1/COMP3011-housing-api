@@ -14,7 +14,7 @@ from app.database import SessionLocal
 from app.models.listing import Listing
 import uuid
 
-YEARLY_URL = "https://prod.publicdata.landregistry.gov.uk/pp-{year}.csv"
+YEARLY_URL = "https://price-paid-data.publicdata.landregistry.gov.uk/pp-{year}.csv"
 
 # Map Land Registry property type codes to str
 PROPERTY_TYPE_MAP = {
@@ -140,17 +140,20 @@ def import_year(year: int, db, dry_run: bool = False) -> int:
     print(f"  Downloading {year} data from {url} ...")
 
     try:
-        response = requests.get(url, stream=True, timeout=120)
+        print(f"    (downloading full file, this may take a moment...)")
+        response = requests.get(url, timeout=300)
         response.raise_for_status()
     except requests.RequestException as e:
         print(f"  ERROR: Failed to download {year} data: {e}")
         return 0
 
+    print(f"    Download complete ({len(response.content) / 1024 / 1024:.1f} MB). Parsing...")
+
     batch = []
     total = 0
     skipped = 0
 
-    reader = csv.reader(io.TextIOWrapper(response.raw, encoding="utf-8", errors="replace"))
+    reader = csv.reader(io.StringIO(response.text))
 
     for row in reader:
         parsed = parse_row(row)
