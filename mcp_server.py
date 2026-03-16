@@ -1,15 +1,3 @@
-"""
-MCP (Model Context Protocol) Server
-=====================================
-Exposes the UK Housing Affordability API as a set of MCP tools so that
-AI assistants (e.g. Claude Desktop, Cursor) can call the API directly.
-
-Usage (after docker compose up):
-  python mcp_server.py
-
-Each tool maps 1-to-1 with a public API endpoint.
-"""
-
 import httpx
 from mcp.server.fastmcp import FastMCP
 
