@@ -1,0 +1,41 @@
+services:
+
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: housing_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-housing_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-housing_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-housing_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-housing_user} -d ${POSTGRES_DB:-housing_db}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: housing_api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./app:/app/app
+      - ./alembic:/app/alembic
+      - ./alembic.ini:/app/alembic.ini
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
