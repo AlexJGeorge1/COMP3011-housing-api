@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.middleware import ErrorHandlingMiddleware
 
 app = FastAPI(
     title="UK Housing Affordability Intelligence API",
@@ -23,6 +24,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(ErrorHandlingMiddleware)
 
 
 # ── Health check ──────────────────────────────────────────────────────────────
