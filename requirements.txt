@@ -14,7 +14,7 @@ passlib[bcrypt]==1.7.4
 python-multipart==0.0.9
 
 # ── Configuration ─────────────────────────────────────────────────────────────
-pydantic-settings==2.2.1
+pydantic-settings==2.5.2
 python-dotenv==1.0.1
 
 # ── AI / Embeddings ───────────────────────────────────────────────────────────

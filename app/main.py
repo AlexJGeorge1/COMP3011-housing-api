@@ -15,7 +15,6 @@ app = FastAPI(
     license_info={"name": "MIT"},
 )
 
-# ── CORS ──────────────────────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -23,16 +22,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-# ── Health check ──────────────────────────────────────────────────────────────
 @app.get("/health", tags=["Health"], summary="Service health check")
 def health_check():
     """Returns a simple status message confirming the API is running."""
     return {"status": "ok", "version": "1.0.0"}
 
 
-# ── Routers ───────────────────────────────────────────────────────────────────
+# Routers 
 from app.auth import router as auth_router
 from app.routers.listings import router as listings_router
 from app.routers.regions import router as regions_router

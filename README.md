@@ -1,157 +1,183 @@
 # UK Housing Affordability Intelligence API
 
-> **COMP3011 Web Services and Web Data — Individual Coursework**
-> University of Leeds, 2025/26
+A RESTful API built with **FastAPI**, **PostgreSQL + pgvector**, and **Llama 3 via Groq** that combines HM Land Registry Price Paid Data, ONS salary data, and ONS private rental statistics to deliver housing affordability insights across UK regions.
 
-A RESTful API that combines three UK public datasets to answer: **can someone on a regional median salary realistically afford to buy or rent a home in that region?**
+---
 
-The API integrates:
-- 🏠 **HM Land Registry Price Paid Data** — property transaction prices (2015–2024)
-- 💷 **ONS Annual Survey of Hours and Earnings (ASHE)** — median salaries by region
-- 🔑 **ONS Private Rental Market Summary (PRMS)** — median rents by area
-
-
-
-## Tech Stack
-
-| Layer | Technology | Justification |
-||||
-| API Framework | FastAPI 0.111 | Async-native, auto-generates OpenAPI docs |
-| Database | PostgreSQL 16 | Mandated; ACID-compliant, handles 8M+ rows |
-| ORM | SQLAlchemy 2.x | Type-safe, migration-compatible |
-| Migrations | Alembic | Schema version control |
-| Vector Search | pgvector | Semantic search without a separate vector DB |
-| Authentication | JWT (python-jose) | Stateless, industry-standard |
-| LLM Integration | Anthropic Claude | AI-powered narrative analysis endpoint |
-| Embeddings | sentence-transformers | Local CPU inference — free, private, reproducible |
-| Containerisation | Docker Compose | Single-command deployment, reproducible |
-| Testing | pytest + httpx | Async-compatible API testing |
-
-
-
-## Prerequisites
-
-- Docker Desktop 4.x+ (running)
-- Python 3.11+
-- Git
-
-
-
-## Setup & Running
-
-### 1. Clone and configure
+## Quick Start
 
 ```bash
-git clone https://github.com/<your-username>/COMP3011-housing-api.git
+# 1. Clone and enter the repo
+git clone https://github.com/AlexJGeorge1/COMP3011-housing-api.git
 cd COMP3011-housing-api
-cp .env.template .env
-# Edit .env and fill in required values (see below)
-```
 
-### 2. Start the stack
+# 2. Copy environment config
+cp .env.template .env           # then edit .env with your values
 
-```bash
-docker compose up --build
-```
+# 3. Build and start all services
+docker compose up -d --build
 
-The API will be available at **http://localhost:8000**
-
-### 3. Run database migrations
-
-```bash
+# 4. Run database migrations
 docker compose exec api alembic upgrade head
 ```
 
-### 4. Import data (optional — seeds the database with real data)
+API is now running at `http://localhost:8000`  
+Interactive docs: `http://localhost:8000/docs`
+
+---
+
+## Data Setup
+
+No manual file downloads required — the importers fetch or use bundled data automatically.
 
 ```bash
-docker compose exec api python scripts/import_land_registry.py
+# Import ONS salary + rent data into the `regions` table
+# (data is hardcoded from ONS ASHE 2023 and ONS PRMS 2023)
 docker compose exec api python scripts/import_ons_data.py
+
+# Import Land Registry Price Paid data into the `listings` table
+# (downloads directly from publicdata.landregistry.gov.uk — takes ~10 min per year)
+docker compose exec api python scripts/import_land_registry.py
 ```
 
+Run `import_ons_data.py` first — the affordability and rent-to-buy endpoints depend on region data being present.
 
-
-## Environment Variables
-
-Copy `.env.template` to `.env` and configure:
-
-| Variable | Required | Description |
-||||
-| `DATABASE_URL` | ✅ | PostgreSQL connection string |
-| `SECRET_KEY` | ✅ | Random string for JWT signing (min 32 chars) |
-| `ALGORITHM` | ✅ | JWT algorithm, use `HS256` |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | ✅ | Token lifetime, e.g. `30` |
-| `ANTHROPIC_API_KEY` | ⚠️ Optional | Required for `/insights` endpoint; degrades gracefully if absent |
-
-
+---
 
 ## API Endpoints
 
+### Authentication
 | Method | Endpoint | Auth | Description |
-|||||
-| GET | `/health` | Public | Service health check |
-| POST | `/token` | Public | Obtain JWT access token |
-| GET/POST/PUT/DELETE | `/listings` | Mixed | Property listing CRUD |
-| GET/POST/PUT/DELETE | `/regions` | Mixed | Regional data CRUD |
-| GET | `/affordability/{region}` | Public | Price-to-salary affordability score |
-| GET | `/trends/{region}` | Public | Historical price trends |
-| GET | `/rent-to-buy/{region}` | Public | Rent vs buy cost comparison |
-| POST | `/search` | Public | Natural language semantic search |
-| POST | `/insights` | Public | LLM-generated affordability narrative |
+|---|---|---|---|
+| POST | `/token` | — | Get a JWT token (`username: admin`, `password: secret`) |
 
-> Full interactive documentation: **http://localhost:8000/docs**
->
-> API documentation PDF: see [`docs/api-documentation.pdf`](docs/api-documentation.pdf)
+### Listings (CRUD)
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| GET | `/listings` | — | List all listings (supports `?region=`, `?limit=`, `?offset=`) |
+| GET | `/listings/{id}` | — | Get a single listing by UUID |
+| POST | `/listings` | ✅ JWT | Create a new listing |
+| PUT | `/listings/{id}` | ✅ JWT | Update a listing |
+| DELETE | `/listings/{id}` | ✅ JWT | Delete a listing |
 
+### Regions (CRUD)
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| GET | `/regions` | — | List all ONS regions |
+| GET | `/regions/{id}` | — | Get a region by ID |
+| POST | `/regions` | ✅ JWT | Create a region |
+| PUT | `/regions/{id}` | ✅ JWT | Update a region |
+| DELETE | `/regions/{id}` | ✅ JWT | Delete a region |
 
+### Analytics
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| GET | `/affordability/{region}` | — | Price-to-income ratio, rent-to-income %, affordability band |
+| GET | `/trends/{region}` | — | Year-on-year median prices (2015–2024) + CAGR |
+| GET | `/rent-to-buy/{region}` | — | Mortgage vs rent comparison + deposit savings timeline |
 
-## Authentication
+### Intelligence (AI)
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| GET | `/search?q=` | — | Semantic property search using pgvector cosine similarity |
+| GET | `/insights/{region}` | — | AI-generated market summary (Llama 3 via Groq) |
 
-Write endpoints (POST, PUT, DELETE) require a Bearer token. To obtain one:
+### Utility
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/health` | Service health check |
+| GET | `/docs` | Interactive Swagger UI |
+
+---
+
+## MCP Server
+
+The API exposes an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server so AI assistants can call the API as native tools:
 
 ```bash
-curl -X POST http://localhost:8000/token \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "username=admin&password=secret"
+# Start the API first, then run:
+python mcp_server.py
 ```
 
-Use the returned `access_token` as a Bearer token in subsequent requests.
+Available tools: `get_affordability`, `get_trends`, `get_rent_to_buy`, `get_insights`, `search_listings`, `list_regions`.
 
+---
 
+## Testing
 
-## Data Scope & Ethics
-
-This API uses a **2015–2024** window of Land Registry data (~8 million transactions). This scope was chosen deliberately:
-
-- **Computational:** The full dataset (1995–present, 28M+ rows) would require significant infrastructure to import and query efficiently
-- **Ethical:** Pre-2015 data predates consistent ONS salary methodology and key housing policy changes; cross-dataset joins against inconsistent historical methodology would introduce analytical bias
-
-
-
-## Project Structure
-
-```
-housing-api/
-├── app/
-│   ├── main.py           # FastAPI app, middleware, router registration
-│   ├── config.py         # Pydantic settings from .env
-│   ├── database.py       # SQLAlchemy engine, session, Base
-│   ├── auth.py           # JWT creation, verification, dependencies
-│   ├── models/           # SQLAlchemy ORM models
-│   ├── schemas/          # Pydantic request/response schemas
-│   └── routers/          # One file per resource/feature
-├── scripts/              # Data import utilities
-├── alembic/              # Database migrations
-├── tests/                # pytest test suite
-├── docker-compose.yml
-├── Dockerfile
-├── requirements.txt
-└── .env.template
+```bash
+source .venv/bin/activate
+pytest tests/ -v
 ```
 
-## GenAI
+Tests use an in-memory SQLite database — no Docker required. A small number of tests are skipped on SQLite as they require PostgreSQL's `percentile_cont` aggregate.
 
-This project was developed with assistance from **Claude Sonnet 4.6** for architecture planning and design decision discussion. AI use is declared in accordance with COMP3011 assessment guidelines. Full conversation logs are included as Appendix A in the technical report.
+---
 
+## Architecture
 
+```
+┌─────────────────────────────────────────┐
+│             FastAPI Application         │
+│  ┌─────────┐  ┌──────────┐  ┌───────┐  │
+│  │Listings │  │ Regions  │  │ Auth  │  │
+│  │  CRUD   │  │  CRUD    │  │  JWT  │  │
+│  └─────────┘  └──────────┘  └───────┘  │
+│  ┌──────────────────────────────────┐   │
+│  │       Analytics Endpoints        │   │
+│  │  /affordability  /trends         │   │
+│  │  /rent-to-buy                    │   │
+│  └──────────────────────────────────┘   │
+│  ┌──────────────────────────────────┐   │
+│  │        Intelligence Layer        │   │
+│  │  /search (pgvector)              │   │
+│  │  /insights (Llama 3 via Groq)    │   │
+│  └──────────────────────────────────┘   │
+└───────────────┬─────────────────────────┘
+                │
+        ┌───────▼────────┐
+        │  PostgreSQL 16  │
+        │  + pgvector     │
+        └────────────────┘
+```
 
+### Key Design Decisions
+- **pgvector** — enables cosine similarity semantic search without a separate vector database
+- **`percentile_cont(0.5)`** — true SQL median (not average) for accurate house price reporting  
+- **`all-MiniLM-L6-v2`** — 384-dim local sentence embedding model; no API calls, fully reproducible
+- **Groq / Llama 3** — free-tier LLM grounded in real DB statistics to prevent hallucination
+- **Alembic** — schema migrations keep the database schema version-controlled
+
+---
+
+## Environment Variables
+
+See `.env.template` for all variables. Key ones:
+
+| Variable | Description |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `SECRET_KEY` | JWT signing secret (generate with `python -c "import secrets; print(secrets.token_hex(32))"`) |
+| `GROQ_API_KEY` | Free key from [console.groq.com](https://console.groq.com) — required for `/insights` |
+
+---
+
+## Tech Stack
+
+| Component | Technology |
+|---|---|
+| Framework | FastAPI 0.111 |
+| Database | PostgreSQL 16 + pgvector |
+| ORM / Migrations | SQLAlchemy 2 + Alembic |
+| Auth | JWT (python-jose + passlib) |
+| Embeddings | sentence-transformers (`all-MiniLM-L6-v2`) |
+| LLM | Llama 3.1 8B via Groq API |
+| MCP | FastMCP |
+| Testing | pytest + SQLite (in-memory) |
+| Containerisation | Docker Compose |
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE).
