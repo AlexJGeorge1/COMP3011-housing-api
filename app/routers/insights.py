@@ -20,11 +20,7 @@ class InsightsResponse(BaseModel):
 
 
 def _call_llm(prompt: str) -> tuple[str, str]:
-    """
-    Call Groq's API (free tier) using Llama 3.
-    Returns (insight_text, model_name).
-    Falls back gracefully if no API key is set.
-    """
+# call groq api 
     api_key = os.getenv("GROQ_API_KEY", "")
     if not api_key or api_key == "your-groq-api-key-here":
         return (
@@ -53,13 +49,6 @@ def _call_llm(prompt: str) -> tuple[str, str]:
     summary="AI-generated housing market intelligence for a region",
 )
 def get_insights(region_name: str, db: Session = Depends(get_db)):
-    """
-    Uses Llama 3 (via Groq's free API) to generate a concise housing market
-    summary grounded in real data from the database.
-
-    Requires `GROQ_API_KEY` in `.env`. Get a free key at https://console.groq.com.
-    If the key is absent, returns a helpful fallback message without raising an error.
-    """
     region = (
         db.query(Region)
         .filter(func.lower(Region.name) == region_name.strip().lower())
