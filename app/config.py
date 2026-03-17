@@ -1,5 +1,9 @@
+import logging
 from pydantic_settings import BaseSettings
+from pydantic import model_validator
 from functools import lru_cache
+
+logger = logging.getLogger(__name__)
 
 
 class Settings(BaseSettings):
@@ -18,6 +22,15 @@ class Settings(BaseSettings):
     # ── AI / LLM ──────────────────────────────────────────────────────────────
     # Optional — the /insights endpoint degrades gracefully if absent
     groq_api_key: str | None = None
+
+    @model_validator(mode="after")
+    def _warn_default_credentials(self):
+        if self.demo_password == "secret":
+            logger.warning(
+                "DEMO_PASSWORD is still set to the default value 'secret'. "
+                "Change it before deploying to production."
+            )
+        return self
 
     class Config:
         env_file = ".env"

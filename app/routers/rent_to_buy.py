@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from pydantic import BaseModel
@@ -20,6 +20,9 @@ class RentToBuyResponse(BaseModel):
     months_to_save_deposit: float
     years_to_save_deposit: float
     verdict: str
+    deposit_pct: float
+    interest_rate: float
+    term_years: int
 
     model_config = {"from_attributes": True}
 
@@ -43,7 +46,13 @@ def _mortgage_monthly(price: float, deposit_pct: float = 0.10, rate_pct: float =
     response_model=RentToBuyResponse,
     summary="Rent-vs-buy comparison for a region",
 )
-def get_rent_to_buy(region_name: str, db: Session = Depends(get_db)):
+def get_rent_to_buy(
+    region_name: str,
+    deposit_pct: float = Query(0.10, ge=0.05, le=0.40, description="Deposit as a decimal, e.g. 0.10 for 10%"),
+    interest_rate: float = Query(4.5, ge=0.1, le=15.0, description="Annual interest rate %"),
+    term_years: int = Query(25, ge=5, le=35, description="Mortgage term in years"),
+    db: Session = Depends(get_db),
+):
     """
     Compares estimated monthly mortgage cost against median rent, and estimates
     how many months a median-salary earner would need to save a 10% deposit.
@@ -77,8 +86,8 @@ def get_rent_to_buy(region_name: str, db: Session = Depends(get_db)):
     rent = float(region.median_rent)
     salary = float(region.median_salary)
 
-    mortgage = _mortgage_monthly(median_price)
-    deposit = median_price * 0.10
+    mortgage = _mortgage_monthly(median_price, deposit_pct=deposit_pct, rate_pct=interest_rate, term_years=term_years)
+    deposit = median_price * deposit_pct
 
     # Assume saving 20% of monthly take-home (approx salary * 0.67 * 0.20)
     monthly_take_home = salary / 12 * 0.67
@@ -108,4 +117,7 @@ def get_rent_to_buy(region_name: str, db: Session = Depends(get_db)):
         months_to_save_deposit=months_to_save,
         years_to_save_deposit=years_to_save,
         verdict=verdict,
+        deposit_pct=deposit_pct,
+        interest_rate=interest_rate,
+        term_years=term_years,
     )

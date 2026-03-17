@@ -1,3 +1,12 @@
+# ─── pgvector notice ────────────────────────────────────────────────────────
+# Render's free-tier PostgreSQL does NOT include the pgvector extension.
+# Before running migrations you must either:
+#   (a) use a pgvector-compatible managed Postgres (e.g. Supabase, Neon,
+#       or a paid Render instance), OR
+#   (b) pre-run  CREATE EXTENSION IF NOT EXISTS vector;  manually on your
+#       database before running alembic upgrade head.
+# ────────────────────────────────────────────────────────────────────────────
+
 services:
   - type: web
     name: housing-api
@@ -13,6 +22,14 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: GROQ_API_KEY
+        sync: false
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "30"
+      - key: DEMO_USERNAME
+        value: admin
+      - key: DEMO_PASSWORD
         sync: false
 
 databases:

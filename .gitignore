@@ -54,8 +54,11 @@ Thumbs.db
 # Keep docker-compose.yml committed; ignore override files
 docker-compose.override.yml
 
-# Data 
-# Raw downloaded datasets 
+# Dashboard (local only, not committed)
+static/
+
+# Data
+# Raw downloaded datasets
 data/raw/
 *.csv
 *.zip

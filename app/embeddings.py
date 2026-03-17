@@ -2,9 +2,7 @@
 Model: all-MiniLM-L6-v2
 """
 
-from functools import lru_cache
 from typing import List
-import numpy as np
 
 def _build_model():
     from sentence_transformers import SentenceTransformer

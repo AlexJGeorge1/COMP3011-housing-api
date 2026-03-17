@@ -121,7 +121,7 @@ COUNTY_TO_REGION = {
     "SOUTH GLOUCESTERSHIRE": "South West",
     "PLYMOUTH": "South West",
     "TORBAY": "South West",
-    "THORROCK": "East of England",
+    "THURROCK": "East of England",
     "SOUTHEND-ON-SEA": "East of England",
     "CENTRAL BEDFORDSHIRE": "East of England",
     "BEDFORD": "East of England",
