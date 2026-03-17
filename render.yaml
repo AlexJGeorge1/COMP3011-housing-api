@@ -1,11 +1,12 @@
-# ─── pgvector notice ────────────────────────────────────────────────────────
-# Render's free-tier PostgreSQL does NOT include the pgvector extension.
-# Before running migrations you must either:
-#   (a) use a pgvector-compatible managed Postgres (e.g. Supabase, Neon,
-#       or a paid Render instance), OR
-#   (b) pre-run  CREATE EXTENSION IF NOT EXISTS vector;  manually on your
-#       database before running alembic upgrade head.
-# ────────────────────────────────────────────────────────────────────────────
+# ─── Render Blueprint ────────────────────────────────────────────────────────
+# Deploys the API as a Docker web service on Render's free tier.
+#
+# DATABASE_URL must be set manually in the Render dashboard to point at a
+# pgvector-compatible PostgreSQL instance (e.g. Neon free tier).
+# Render's own free Postgres does NOT support pgvector; however, even if
+# pgvector is absent the migration will skip the embedding column gracefully
+# and all endpoints except /search will work normally.
+# ─────────────────────────────────────────────────────────────────────────────
 
 services:
   - type: web
@@ -16,9 +17,7 @@ services:
     healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: housing-db
-          property: connectionString
+        sync: false          # set manually — paste your Neon / Supabase connection string
       - key: SECRET_KEY
         generateValue: true
       - key: GROQ_API_KEY
@@ -31,9 +30,3 @@ services:
         value: admin
       - key: DEMO_PASSWORD
         sync: false
-
-databases:
-  - name: housing-db
-    plan: free
-    databaseName: housing_db
-    user: housing_user

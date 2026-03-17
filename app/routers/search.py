@@ -28,13 +28,23 @@ def search_listings(
     region: Optional[str] = Query(None, description="Optional region filter"),
     db: Session = Depends(get_db),
 ):
+    # Check that the embedding column exists (pgvector may not be available)
+    try:
+        has_embeddings = db.execute(
+            text("SELECT 1 FROM listings WHERE embedding IS NOT NULL LIMIT 1")
+        ).first()
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=(
+                "Semantic search is unavailable because the pgvector extension "
+                "is not installed on this PostgreSQL instance. "
+                "CRUD, analytics, and insights endpoints remain fully functional."
+            ),
+        )
+
     # Embed the query into the same vector space as listings
     query_vec = embed_text(q)
-
-    # Check that any listings have embeddings at all
-    has_embeddings = db.execute(
-        text("SELECT 1 FROM listings WHERE embedding IS NOT NULL LIMIT 1")
-    ).first()
 
     if not has_embeddings:
         raise HTTPException(
