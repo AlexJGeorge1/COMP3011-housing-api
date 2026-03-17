@@ -2,23 +2,27 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
 
 class RegionBase(BaseModel):
-    name: str = Field(..., description="Region name")
-    ons_code: str = Field(..., description="ONS area code")
-    median_salary: Optional[float] = Field(None, description="Median salary in GBP/year from ONS ASHE")
-    median_rent: Optional[float] = Field(None, description="Median rent in GBP/month from ONS PRS")
-    year: int = Field(..., description="Data year")
+    """Base schema for a region's economic data."""
+    name: str = Field(..., description="Region name", examples=["London"])
+    ons_code: str = Field(..., description="ONS area code", examples=["E12000007"])
+    median_salary: Optional[float] = Field(None, description="Median salary in GBP/year from ONS ASHE", examples=[45000.0])
+    median_rent: Optional[float] = Field(None, description="Median rent in GBP/month from ONS PRS", examples=[1800.0])
+    year: int = Field(..., description="Data year", examples=[2023])
 
 class RegionCreate(RegionBase):
+    """Schema for creating a new region record."""
     pass
 
 class RegionUpdate(BaseModel):
-    name: Optional[str] = None
-    ons_code: Optional[str] = None
-    median_salary: Optional[float] = None
-    median_rent: Optional[float] = None
-    year: Optional[int] = None
+    """Schema for updating an existing region record."""
+    name: Optional[str] = Field(None, description="Region name", examples=["London"])
+    ons_code: Optional[str] = Field(None, description="ONS area code", examples=["E12000007"])
+    median_salary: Optional[float] = Field(None, description="Median salary in GBP/year from ONS ASHE", examples=[46000.0])
+    median_rent: Optional[float] = Field(None, description="Median rent in GBP/month from ONS PRS", examples=[1850.0])
+    year: Optional[int] = Field(None, description="Data year", examples=[2024])
 
 class RegionResponse(RegionBase):
-    id: str
+    """Schema for returning a region record."""
+    id: str = Field(..., description="Unique identifier for the region record", examples=["550e8400-e29b-41d4-a716-446655440000"])
     
     model_config = ConfigDict(from_attributes=True)

@@ -4,6 +4,12 @@ import uuid
 from app.database import Base
 
 class Region(Base):
+    """
+    SQLAlchemy model representing an ONS region's economic data.
+    
+    Stores aggregated data for a specific geographic region, such as median salary
+    and median rent for a given year. Used for affordability and trend analysis.
+    """
     __tablename__ = "regions"
 
     id = Column(String(36), primary_key=True, index=True, default=lambda: str(uuid.uuid4()))

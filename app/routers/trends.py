@@ -1,7 +1,11 @@
+"""
+API Router for calculating year-on-year house price trends.
+"""
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func, extract
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List
 
 from app.database import get_db
@@ -12,18 +16,20 @@ router = APIRouter(prefix="/trends", tags=["Analytics"])
 
 
 class YearlyPoint(BaseModel):
-    year: int
-    median_price: float
-    transaction_count: int
+    """Schema representing median price and transaction count for a specific year."""
+    year: int = Field(..., description="The year of the data point", examples=[2023])
+    median_price: float = Field(..., description="Median property price in GBP for the year", examples=[250000.0])
+    transaction_count: int = Field(..., description="Number of recorded transactions in the year", examples=[1500])
 
 
 class TrendsResponse(BaseModel):
-    region: str
-    data_from: int
-    data_to: int
-    yearly_data: List[YearlyPoint]
-    total_change_pct: float
-    cagr_pct: float
+    """Schema for returning year-on-year house price trends."""
+    region: str = Field(..., description="Name of the region", examples=["London"])
+    data_from: int = Field(..., description="Start year of the trend data", examples=[2010])
+    data_to: int = Field(..., description="End year of the trend data", examples=[2023])
+    yearly_data: List[YearlyPoint] = Field(..., description="List of yearly data points")
+    total_change_pct: float = Field(..., description="Total percentage change in median price over the period", examples=[50.5])
+    cagr_pct: float = Field(..., description="Compound Annual Growth Rate percentage", examples=[3.2])
 
     model_config = {"from_attributes": True}
 
@@ -32,8 +38,27 @@ class TrendsResponse(BaseModel):
     "/{region_name}",
     response_model=TrendsResponse,
     summary="Year-on-year house price trends for a region",
+    responses={
+        200: {"description": "Successfully retrieved trends"},
+        404: {"description": "Region not found or no listing data available for the region"}
+    }
 )
-def get_trends(region_name: str, db: Session = Depends(get_db)):
+def get_trends(
+    region_name: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Calculate year-on-year house price trends for a specific region.
+    
+    Retrieves median house prices and transaction counts for each year available
+    in the database for the given region. Calculates total percentage change
+    and the Compound Annual Growth Rate (CAGR).
+    
+    - **region_name**: Name of the region to analyze (e.g., "London").
+    - **db**: Database session dependency.
+    
+    Returns a breakdown of yearly median prices and transaction volumes, along with calculated growth metrics.
+    """
     # Validate region exists
     region = (
         db.query(Region)

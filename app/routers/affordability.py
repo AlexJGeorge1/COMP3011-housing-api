@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.database import get_db
 from app.models.listing import Listing
@@ -11,15 +11,16 @@ router = APIRouter(prefix="/affordability", tags=["Analytics"])
 
 
 class AffordabilityResponse(BaseModel):
-    region: str
-    ons_code: str
-    year: int
-    median_salary: float
-    median_rent_monthly: float
-    median_house_price: float
-    price_to_income_ratio: float
-    rent_to_income_pct: float
-    affordability_band: str
+    """Response schema containing derived housing affordability metrics for a region."""
+    region: str = Field(..., description="The name of the UK region", examples=["London"])
+    ons_code: str = Field(..., description="The Office for National Statistics region code", examples=["E12000007"])
+    year: int = Field(..., description="The year of the data", examples=[2023])
+    median_salary: float = Field(..., description="The median annual gross salary in GBP", examples=[41893.0])
+    median_rent_monthly: float = Field(..., description="The median monthly private rent in GBP", examples=[1450.0])
+    median_house_price: float = Field(..., description="The median house sale price in GBP", examples=[515000.0])
+    price_to_income_ratio: float = Field(..., description="Ratio of median house price to median annual salary", examples=[12.29])
+    rent_to_income_pct: float = Field(..., description="Percentage of annual salary required to pay annual rent", examples=[41.5])
+    affordability_band: str = Field(..., description="Categorical classification of affordability based on price-to-income ratio", examples=["severely unaffordable"])
 
     model_config = {"from_attributes": True}
 

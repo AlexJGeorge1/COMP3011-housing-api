@@ -71,14 +71,31 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     return username
 
 
-@router.post("/token")
+@router.post(
+    "/token",
+    summary="Obtain a JWT access token",
+    description="Authenticates a user and returns a JSON Web Token (JWT) for accessing secured endpoints.",
+    responses={
+        200: {
+            "description": "Successfully authenticated. Returns the JWT token.",
+            "content": {
+                "application/json": {
+                    "example": {"access_token": "eyJhbGciOiJIUzI1NiIsInR5c...", "token_type": "bearer"}
+                }
+            }
+        },
+        401: {"description": "Incorrect username or password."},
+    }
+)
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ):
     """
     OAuth2 compatible token login, required for Swagger UI authentication.
+    
     Uses demo credentials from config since this is a public dataset API
-    with writing restricted to an admin.
+    with writing restricted to an admin. Returns an access token valid for the 
+    configured expiration time (default 15 minutes).
     """
     if (form_data.username != settings.demo_username or 
         form_data.password != settings.demo_password):

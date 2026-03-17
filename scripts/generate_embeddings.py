@@ -88,3 +88,5 @@ if __name__ == "__main__":
         print(f"Generating embeddings for up to {limit:,} listings...")
 
     run(limit=limit, skip_existing=skip_existing)
+
+    

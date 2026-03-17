@@ -35,9 +35,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/health", tags=["Health"], summary="Service health check")
+@app.get(
+    "/health",
+    tags=["Health"],
+    summary="Service health check",
+    description="Verifies that the API service is currently running and responsive.",
+    responses={
+        200: {
+            "description": "API is healthy and running.",
+            "content": {
+                "application/json": {
+                    "example": {"status": "ok", "version": "1.0.0"}
+                }
+            }
+        }
+    }
+)
 def health_check():
-    """Returns a simple status message confirming the API is running."""
+    """
+    Returns a simple status JSON payload confirming the API is running.
+    Useful for load balancers or container orchestration platforms to check service liveness.
+    """
     return {"status": "ok", "version": "1.0.0"}
 
 

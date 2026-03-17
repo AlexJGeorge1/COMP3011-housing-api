@@ -1,7 +1,11 @@
+"""
+API Router for calculating rent vs. buy comparisons.
+"""
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.database import get_db
 from app.models.listing import Listing
@@ -11,18 +15,19 @@ router = APIRouter(prefix="/rent-to-buy", tags=["Analytics"])
 
 
 class RentToBuyResponse(BaseModel):
-    region: str
-    median_house_price: float
-    monthly_mortgage_estimate: float
-    monthly_rent: float
-    monthly_saving_vs_renting: float
-    deposit_10pct: float
-    months_to_save_deposit: float
-    years_to_save_deposit: float
-    verdict: str
-    deposit_pct: float
-    interest_rate: float
-    term_years: int
+    """Schema for returning rent vs buy comparison metrics."""
+    region: str = Field(..., description="Name of the region", examples=["London"])
+    median_house_price: float = Field(..., description="Median house price in the region", examples=[500000.0])
+    monthly_mortgage_estimate: float = Field(..., description="Estimated monthly mortgage payment", examples=[2000.0])
+    monthly_rent: float = Field(..., description="Median monthly rent in the region", examples=[1800.0])
+    monthly_saving_vs_renting: float = Field(..., description="Monthly savings of buying vs renting", examples=[-200.0])
+    deposit_10pct: float = Field(..., description="Calculated deposit amount", examples=[50000.0])
+    months_to_save_deposit: float = Field(..., description="Estimated months to save the deposit", examples=[60.0])
+    years_to_save_deposit: float = Field(..., description="Estimated years to save the deposit", examples=[5.0])
+    verdict: str = Field(..., description="Textual verdict of the analysis", examples=["Mortgage costs less than rent."])
+    deposit_pct: float = Field(..., description="Deposit percentage used in calculation", examples=[0.10])
+    interest_rate: float = Field(..., description="Annual interest rate used in calculation", examples=[4.5])
+    term_years: int = Field(..., description="Mortgage term in years used in calculation", examples=[25])
 
     model_config = {"from_attributes": True}
 
@@ -45,6 +50,10 @@ def _mortgage_monthly(price: float, deposit_pct: float = 0.10, rate_pct: float =
     "/{region_name}",
     response_model=RentToBuyResponse,
     summary="Rent-vs-buy comparison for a region",
+    responses={
+        200: {"description": "Successfully calculated rent vs buy metrics"},
+        404: {"description": "Region not found or no listing data available"}
+    }
 )
 def get_rent_to_buy(
     region_name: str,
@@ -55,10 +64,20 @@ def get_rent_to_buy(
 ):
     """
     Compares estimated monthly mortgage cost against median rent, and estimates
-    how many months a median-salary earner would need to save a 10% deposit.
-
-    Mortgage assumptions: 10% deposit, 4.5% p.a. interest (approx. Bank of England
-    base rate + typical lender margin), 25-year repayment term.
+    how many months a median-salary earner would need to save a deposit.
+    
+    Mortgage assumptions can be customized via query parameters, but default to:
+    - 10% deposit
+    - 4.5% p.a. interest (approx. Bank of England base rate + typical lender margin)
+    - 25-year repayment term
+    
+    - **region_name**: Name of the region to analyze (e.g., "London").
+    - **deposit_pct**: Deposit percentage as a decimal (default 0.10).
+    - **interest_rate**: Annual interest rate percentage (default 4.5).
+    - **term_years**: Mortgage term length in years (default 25).
+    - **db**: Database session dependency.
+    
+    Returns a detailed financial comparison and a qualitative verdict on affordability.
     """
     region = (
         db.query(Region)

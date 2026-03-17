@@ -202,7 +202,7 @@ def parse_row(row: list) -> dict | None:
         return None
 
 
-def import_year(year: int, db, dry_run: bool = False) -> int:
+def import_year(year: int, db, dry_run: bool = False, limit: int | None = None) -> int:
     """Download and import a single year of Land Registry data. Returns count of rows imported."""
     url = YEARLY_URL.format(year=year)
     print(f"  Downloading {year} data from {url} ...")
@@ -224,6 +224,9 @@ def import_year(year: int, db, dry_run: bool = False) -> int:
     reader = csv.reader(io.StringIO(response.text))
 
     for row in reader:
+        if limit is not None and total >= limit:
+            break
+
         parsed = parse_row(row)
         if not parsed:
             skipped += 1
@@ -251,13 +254,13 @@ def import_year(year: int, db, dry_run: bool = False) -> int:
     return total
 
 
-def run(years: list[int], dry_run: bool = False):
+def run(years: list[int], dry_run: bool = False, limit: int | None = None):
     db = SessionLocal()
     grand_total = 0
     try:
         for year in years:
             print(f"\n[{year}]")
-            count = import_year(year, db, dry_run=dry_run)
+            count = import_year(year, db, dry_run=dry_run, limit=limit)
             grand_total += count
     finally:
         db.close()
@@ -268,9 +271,10 @@ def run(years: list[int], dry_run: bool = False):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Import Land Registry Price Paid data (2015-2024)")
     parser.add_argument("--year", type=int, help="Import a single year (default: all 2015-2024)")
+    parser.add_argument("--limit", type=int, help="Limit the number of rows to import per year")
     parser.add_argument("--dry-run", action="store_true", help="Parse rows without writing to DB")
     args = parser.parse_args()
 
     years = [args.year] if args.year else TARGET_YEARS
-    print(f"Land Registry Importer — years: {years}, dry_run: {args.dry_run}")
-    run(years, dry_run=args.dry_run)
+    print(f"Land Registry Importer — years: {years}, dry_run: {args.dry_run}, limit: {args.limit}")
+    run(years, dry_run=args.dry_run, limit=args.limit)

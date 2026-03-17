@@ -12,6 +12,13 @@ except Exception:
 
 
 class Listing(Base):
+    """
+    SQLAlchemy model representing a property listing.
+    
+    Stores details about property transactions, including address, region, price,
+    number of bedrooms, property type, and transaction date. It also supports
+    an optional vector embedding column for semantic search capabilities.
+    """
     __tablename__ = "listings"
 
     id = Column(String(36), primary_key=True, index=True, default=lambda: str(uuid.uuid4()))

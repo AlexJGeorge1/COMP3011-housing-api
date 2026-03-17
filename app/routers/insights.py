@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from app.config import get_settings
 
@@ -13,10 +13,11 @@ router = APIRouter(prefix="/insights", tags=["Intelligence"])
 
 
 class InsightsResponse(BaseModel):
-    region: str
-    insight: str
-    data_used: dict
-    powered_by: str
+    """Response schema containing AI-generated intelligence about a region's housing market."""
+    region: str = Field(..., description="The name of the region analyzed", examples=["London"])
+    insight: str = Field(..., description="The AI-generated insight text, or an error/fallback message", examples=["Housing in London remains severely unaffordable for first-time buyers."])
+    data_used: dict = Field(..., description="A dictionary of the actual metrics used to prompt the AI model", examples=[{"median_house_price": 500000, "median_salary": 40000, "price_to_income_ratio": 12.5}])
+    powered_by: str = Field(..., description="Identifies the LLM used, or 'error'/'fallback' if the call failed", examples=["llama-3.1-8b-instant (Groq)"])
 
 
 def _call_llm(prompt: str) -> tuple[str, str]:

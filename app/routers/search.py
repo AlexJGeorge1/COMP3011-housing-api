@@ -1,7 +1,11 @@
+"""
+API Router for semantic search functionality over property listings.
+"""
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 
 from app.database import get_db
@@ -12,15 +16,21 @@ router = APIRouter(prefix="/search", tags=["Intelligence"])
 
 
 class SearchResponse(BaseModel):
-    query: str
-    results: List[ListingResponse]
-    count: int
+    """Schema for the semantic search response."""
+    query: str = Field(..., description="The original search query", examples=["affordable flat in London"])
+    results: List[ListingResponse] = Field(..., description="List of matching property listings")
+    count: int = Field(..., description="Number of results returned", examples=[10])
 
 
 @router.get(
     "",
     response_model=SearchResponse,
     summary="Semantic search over property listings",
+    responses={
+        200: {"description": "Successful search"},
+        422: {"description": "No embeddings found or validation error"},
+        503: {"description": "Semantic search unavailable due to missing pgvector extension"}
+    }
 )
 def search_listings(
     q: str = Query(..., min_length=3, description="Natural language search query, e.g. 'affordable flat in London'"),
@@ -28,6 +38,19 @@ def search_listings(
     region: Optional[str] = Query(None, description="Optional region filter"),
     db: Session = Depends(get_db),
 ):
+    """
+    Perform a semantic search over property listings.
+    
+    Expects a natural language query and uses vector embeddings (pgvector) to find 
+    the most relevant property listings based on cosine similarity.
+    
+    - **q**: The natural language search query string.
+    - **limit**: Maximum number of listings to return (default 10, max 50).
+    - **region**: Optional filter to restrict search to a specific ONS region.
+    - **db**: Database session dependency.
+    
+    Returns a list of listings matching the query semantically, along with the original query and count.
+    """
     # Check that the embedding column exists (pgvector may not be available)
     try:
         has_embeddings = db.execute(
