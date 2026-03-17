@@ -1,4 +1,7 @@
+import logging
+import uuid
 from typing import Annotated, List, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
@@ -6,8 +9,9 @@ from app.database import get_db
 from app.auth import get_current_user
 from app.models.listing import Listing
 from app.schemas.listing import ListingCreate, ListingUpdate, ListingResponse
+from app.embeddings import embed_listing
 
-import uuid
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/listings", tags=["Listings"])
 
@@ -53,6 +57,14 @@ def create_listing(
     db.add(listing)
     db.commit()
     db.refresh(listing)
+
+    try:
+        listing.embedding = embed_listing(listing)
+        db.commit()
+        db.refresh(listing)
+    except Exception:
+        logger.warning("Failed to generate embedding for listing %s", listing.id)
+
     return listing
 
 
