@@ -15,8 +15,13 @@ SAMPLE_REGION = {
     "year": 2023,
 }
 
+from tests.conftest import TEST_DATABASE_URL
+
 # Mark tests that require PostgreSQL-specific SQL (percentile_cont)
-postgres_only = pytest.mark.skip(reason="Requires PostgreSQL (percentile_cont not supported by SQLite)")
+postgres_only = pytest.mark.skipif(
+    "sqlite" in TEST_DATABASE_URL,
+    reason="Requires PostgreSQL (percentile_cont not supported by SQLite)",
+)
 
 
 class TestAffordabilityEndpoint:

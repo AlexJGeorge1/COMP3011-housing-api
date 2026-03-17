@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from pydantic import BaseModel
 from typing import Optional
-import os
+from app.config import get_settings
 
 from app.database import get_db
 from app.models.listing import Listing
@@ -21,7 +21,8 @@ class InsightsResponse(BaseModel):
 
 def _call_llm(prompt: str) -> tuple[str, str]:
 # call groq api 
-    api_key = os.getenv("GROQ_API_KEY", "")
+    settings = get_settings()
+    api_key = settings.groq_api_key
     if not api_key or api_key == "your-groq-api-key-here":
         return (
             "AI insights are unavailable (no GROQ_API_KEY configured). "

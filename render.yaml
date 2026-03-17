@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: housing-api
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: housing-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: GROQ_API_KEY
+        sync: false
+
+databases:
+  - name: housing-db
+    plan: free
+    databaseName: housing_db
+    user: housing_user

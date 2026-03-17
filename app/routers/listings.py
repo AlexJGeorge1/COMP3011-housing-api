@@ -44,7 +44,7 @@ def create_listing(
     current_user: str = Depends(get_current_user),
 ):
 
-    # Creates a new property listing Requires JWT authentication
+    """Creates a new property listing. Requires JWT authentication."""
 
     listing = Listing(
         id=str(uuid.uuid4()),
@@ -63,7 +63,7 @@ def update_listing(
     db: Session = Depends(get_db),
     current_user: str = Depends(get_current_user),
 ):
-   # Updates the fields of an existing listin
+    """Updates the fields of an existing listing."""
     listing = db.query(Listing).filter(Listing.id == listing_id).first()
     if not listing:
         raise HTTPException(
@@ -84,7 +84,7 @@ def delete_listing(
     db: Session = Depends(get_db),
     current_user: str = Depends(get_current_user),
 ):
-    # deletes a listing 
+    """Deletes a property listing."""
     listing = db.query(Listing).filter(Listing.id == listing_id).first()
     if not listing:
         raise HTTPException(

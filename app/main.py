@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.middleware import ErrorHandlingMiddleware
 
 app = FastAPI(
     title="UK Housing Affordability Intelligence API",
@@ -15,6 +16,7 @@ app = FastAPI(
     license_info={"name": "MIT"},
 )
 
+app.add_middleware(ErrorHandlingMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -22,6 +24,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 @app.get("/health", tags=["Health"], summary="Service health check")
 def health_check():
     """Returns a simple status message confirming the API is running."""
