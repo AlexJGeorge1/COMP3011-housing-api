@@ -83,17 +83,85 @@ COUNTY_TO_REGION = {
     "POWYS": "Wales",
     "SOUTH GLAMORGAN": "Wales",
     "WEST GLAMORGAN": "Wales",
-
-
+    "ISLE OF ANGLESEY": "Wales",
+    "FLINTSHIRE": "Wales",
+    "WREXHAM": "Wales",
+    "CONWY": "Wales",
+    "DENBIGHSHIRE": "Wales",
+    "SWANSEA": "Wales",
+    "CARDIFF": "Wales",
+    "NEWPORT": "Wales",
+    "PEMBROKESHIRE": "Wales",
+    "MONMOUTHSHIRE": "Wales",
+    "CEREDIGION": "Wales",
+    "BRIDGEND": "Wales",
+    "RHONDDA CYNON TAFF": "Wales",
+    "NEATH PORT TALBOT": "Wales",
+    "CAERPHILLY": "Wales",
+    "MERTHYR TYDFIL": "Wales",
+    "TORFAEN": "Wales",
+    "ISLE OF WIGHT": "South East",
+    "WINDSOR AND MAIDENHEAD": "South East",
+    "WOKINGHAM": "South East",
+    "BRACKNELL FOREST": "South East",
+    "SLOUGH": "South East",
+    "READING": "South East",
+    "WEST BERKSHIRE": "South East",
+    "MILTON KEYNES": "South East",
+    "BRIGHTON AND HOVE": "South East",
+    "SOUTHAMPTON": "South East",
+    "PORTSMOUTH": "South East",
+    "MEDWAY": "South East",
+    "BOURNEMOUTH": "South West",
+    "POOLE": "South West",
+    "BOURNEMOUTH, CHRISTCHURCH AND POOLE": "South West",
+    "SWINDON": "South West",
+    "BATH AND NORTH EAST SOMERSET": "South West",
+    "NORTH SOMERSET": "South West",
+    "SOUTH GLOUCESTERSHIRE": "South West",
+    "PLYMOUTH": "South West",
+    "TORBAY": "South West",
+    "THORROCK": "East of England",
+    "SOUTHEND-ON-SEA": "East of England",
+    "CENTRAL BEDFORDSHIRE": "East of England",
+    "BEDFORD": "East of England",
+    "PETERBOROUGH": "East of England",
+    "LUTON": "East of England",
+    "HEREFORDSHIRE": "West Midlands",
+    "TELFORD AND WREKIN": "West Midlands",
+    "STOKE-ON-TRENT": "West Midlands",
+    "NOTTINGHAM": "East Midlands",
+    "DERBY": "East Midlands",
+    "LEICESTER": "East Midlands",
+    "CHESHIRE EAST": "North West",
+    "CHESHIRE WEST AND CHESTER": "North West",
+    "HALTON": "North West",
+    "BLACKBURN WITH DARWEN": "North West",
+    "BLACKPOOL": "North West",
+    "WARRINGTON": "North West",
+    "YORK": "Yorkshire and The Humber",
+    "NORTH EAST LINCOLNSHIRE": "Yorkshire and The Humber",
+    "NORTH LINCOLNSHIRE": "Yorkshire and The Humber",
+    "DARLINGTON": "North East",
+    "HARTLEPOOL": "North East",
+    "MIDDLESBROUGH": "North East",
+    "REDCAR AND CLEVELAND": "North East",
+    "STOCKTON-ON-TEES": "North East",
 }
 
 TARGET_YEARS = list(range(2015, 2025)) 
 BATCH_SIZE = 1000  
 
+_other_count = 0
 
-def map_region(county: str) -> str:
+
+def map_region(county: str, track_others: bool = True) -> str:
     """Map a Land Registry county name to an ONS region name."""
-    return COUNTY_TO_REGION.get(county.upper().strip(), "Other")
+    global _other_count
+    region = COUNTY_TO_REGION.get(county.upper().strip(), "Other")
+    if region == "Other" and track_others:
+        _other_count += 1
+    return region
 
 
 def parse_row(row: list) -> dict | None:
@@ -176,7 +244,10 @@ def import_year(year: int, db, dry_run: bool = False) -> int:
         db.bulk_save_objects(batch)
         db.commit()
 
-    print(f"  Year {year}: {total:,} rows imported, {skipped:,} skipped.")
+    global _other_count
+    print(f"  Year {year}: {total:,} rows imported, {skipped:,} skipped. ({_other_count:,} fell into 'Other' region)")
+    # Reset for next call if run in loop
+    _other_count = 0
     return total
 
 

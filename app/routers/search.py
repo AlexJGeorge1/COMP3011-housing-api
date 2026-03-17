@@ -61,13 +61,9 @@ def search_listings(
     if region:
         params["region"] = region
 
-    rows = db.execute(sql, params).fetchall()
-
     from app.models.listing import Listing
-    results = []
-    for row in rows:
-        listing = db.query(Listing).filter(Listing.id == row.id).first()
-        if listing:
-            results.append(listing)
+    # Fetch results from the DB and map them directly to SQLAlchemy Ranking models
+    # This avoids the N+1 query problem by hydrating models in one roundtrip
+    results = db.query(Listing).from_statement(sql).params(**params).all()
 
     return SearchResponse(query=q, results=results, count=len(results))

@@ -17,7 +17,7 @@ class Settings(BaseSettings):
 
     # ── AI / LLM ──────────────────────────────────────────────────────────────
     # Optional — the /insights endpoint degrades gracefully if absent
-    anthropic_api_key: str | None = None
+    groq_api_key: str | None = None
 
     class Config:
         env_file = ".env"

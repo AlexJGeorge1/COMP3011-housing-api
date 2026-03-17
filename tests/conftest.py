@@ -13,10 +13,14 @@ from sqlalchemy.orm import sessionmaker
 from app.main import app
 from app.database import Base, get_db
 
-# Use SQLite in-memory database for tests (no PostgreSQL needed)
-SQLITE_URL = "sqlite:///./test.db"
+import os
 
-engine = create_engine(SQLITE_URL, connect_args={"check_same_thread": False})
+# Use SQLite in-memory database for tests by default (no PostgreSQL needed)
+TEST_DATABASE_URL = os.environ.get("TEST_DATABASE_URL", "sqlite:///./test.db")
+
+# Use slightly different connect_args for SQLite
+connect_args = {"check_same_thread": False} if "sqlite" in TEST_DATABASE_URL else {}
+engine = create_engine(TEST_DATABASE_URL, connect_args=connect_args)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

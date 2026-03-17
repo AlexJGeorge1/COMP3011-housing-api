@@ -88,6 +88,9 @@ Run `import_ons_data.py` first — the affordability and rent-to-buy endpoints d
 | GET | `/health` | Service health check |
 | GET | `/docs` | Interactive Swagger UI |
 
+### Static Documentation
+The comprehensive API documentation is included as a PDF: [API_Documentation.pdf](docs/API_Documentation.pdf).
+
 ---
 
 ## MCP Server
