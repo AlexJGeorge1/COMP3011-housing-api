@@ -75,4 +75,6 @@ data/raw/
 *.log
 logs/
 
-.claude/
+md\ files\ /
+
+openapi.json
