@@ -1,3 +1,4 @@
+from typing import Optional
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
@@ -29,7 +30,7 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None):
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     """Generates a JWT encoded token with an expiration time."""
     to_encode = data.copy()
     if expires_delta:
@@ -62,7 +63,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
             settings.secret_key, 
             algorithms=[settings.algorithm]
         )
-        username: str | None = payload.get("sub")
+        username: Optional[str] = payload.get("sub")
         if username is None:
             raise credentials_exception
     except InvalidTokenError:

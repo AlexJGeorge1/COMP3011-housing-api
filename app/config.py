@@ -1,3 +1,4 @@
+from typing import Optional
 import logging
 from pydantic_settings import BaseSettings
 from pydantic import model_validator
@@ -21,7 +22,7 @@ class Settings(BaseSettings):
 
     # ── AI / LLM ──────────────────────────────────────────────────────────────
     # Optional — the /insights endpoint degrades gracefully if absent
-    groq_api_key: str | None = None
+    groq_api_key: Optional[str] = None
 
     @model_validator(mode="after")
     def _warn_default_credentials(self):

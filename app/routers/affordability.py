@@ -43,6 +43,11 @@ def _affordability_band(ratio: float) -> str:
     summary="Housing affordability metrics for a region",
 )
 def get_affordability(region_name: str, db: Session = Depends(get_db)):
+    """
+    Retrieve derived housing affordability metrics for a specific UK region.
+
+    - **region_name**: The name of the region to query (e.g., "London").
+    """
     # Look up the region 
 
     region = (

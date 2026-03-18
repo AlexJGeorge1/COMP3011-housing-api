@@ -51,6 +51,11 @@ def _call_llm(prompt: str) -> tuple[str, str]:
     summary="AI-generated housing market intelligence for a region",
 )
 def get_insights(region_name: str, db: Session = Depends(get_db)):
+    """
+    Generate an AI-powered summary of the housing market in a specific region.
+
+    - **region_name**: The name of the region to analyze (e.g., "London").
+    """
     region = (
         db.query(Region)
         .filter(func.lower(Region.name) == region_name.strip().lower())
