@@ -1,1 +1,1921 @@
-{"openapi":"3.1.0","info":{"title":"UK Housing Affordability Intelligence API","description":"Combines HM Land Registry Price Paid Data, ONS Annual Survey of Hours and Earnings, and ONS Private Rental Market Summary to provide affordability insights across UK regions.","contact":{"name":"COMP3011 Coursework","url":"https://github.com/AlexJGeorge1/COMP3011-housing-api"},"license":{"name":"MIT"},"version":"1.0.0"},"paths":{"/health":{"get":{"tags":["Health"],"summary":"Service health check","description":"Returns a simple status message confirming the API is running.","operationId":"health_check_health_get","responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{}}}}}}},"/token":{"post":{"tags":["Authentication"],"summary":"Login For Access Token","description":"OAuth2 compatible token login, required for Swagger UI authentication.\nUses demo credentials from config since this is a public dataset API\nwith writing restricted to an admin.","operationId":"login_for_access_token_token_post","requestBody":{"content":{"application/x-www-form-urlencoded":{"schema":{"$ref":"#/components/schemas/Body_login_for_access_token_token_post"}}},"required":true},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/listings":{"get":{"tags":["Listings"],"summary":"List all property listings","operationId":"get_listings_listings_get","parameters":[{"name":"region","in":"query","required":false,"schema":{"anyOf":[{"type":"string"},{"type":"null"}],"description":"Filter by region name","title":"Region"},"description":"Filter by region name"},{"name":"limit","in":"query","required":false,"schema":{"type":"integer","maximum":500,"description":"Maximum number of results to return","default":100,"title":"Limit"},"description":"Maximum number of results to return"},{"name":"offset","in":"query","required":false,"schema":{"type":"integer","description":"Number of results to skip (for pagination)","default":0,"title":"Offset"},"description":"Number of results to skip (for pagination)"}],"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/ListingResponse"},"title":"Response Get Listings Listings Get"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}},"post":{"tags":["Listings"],"summary":"Create a new listing","operationId":"create_listing_listings_post","security":[{"OAuth2PasswordBearer":[]}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/ListingCreate"}}}},"responses":{"201":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ListingResponse"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/listings/{listing_id}":{"get":{"tags":["Listings"],"summary":"Get a single listing by ID","description":"Returns one property listing","operationId":"get_listing_listings__listing_id__get","parameters":[{"name":"listing_id","in":"path","required":true,"schema":{"type":"string","title":"Listing Id"}}],"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ListingResponse"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}},"put":{"tags":["Listings"],"summary":"Update a listing","operationId":"update_listing_listings__listing_id__put","security":[{"OAuth2PasswordBearer":[]}],"parameters":[{"name":"listing_id","in":"path","required":true,"schema":{"type":"string","title":"Listing Id"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/ListingUpdate"}}}},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ListingResponse"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}},"delete":{"tags":["Listings"],"summary":"Delete a listing","operationId":"delete_listing_listings__listing_id__delete","security":[{"OAuth2PasswordBearer":[]}],"parameters":[{"name":"listing_id","in":"path","required":true,"schema":{"type":"string","title":"Listing Id"}}],"responses":{"204":{"description":"Successful Response"},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/regions":{"get":{"tags":["Regions"],"summary":"List all regions","operationId":"get_regions_regions_get","responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"items":{"$ref":"#/components/schemas/RegionResponse"},"type":"array","title":"Response Get Regions Regions Get"}}}}}},"post":{"tags":["Regions"],"summary":"Create a new region","operationId":"create_region_regions_post","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/RegionCreate"}}},"required":true},"responses":{"201":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/RegionResponse"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}},"security":[{"OAuth2PasswordBearer":[]}]}},"/regions/{region_id}":{"get":{"tags":["Regions"],"summary":"Get a single region by ID","operationId":"get_region_regions__region_id__get","parameters":[{"name":"region_id","in":"path","required":true,"schema":{"type":"string","title":"Region Id"}}],"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/RegionResponse"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}},"put":{"tags":["Regions"],"summary":"Update a region","operationId":"update_region_regions__region_id__put","security":[{"OAuth2PasswordBearer":[]}],"parameters":[{"name":"region_id","in":"path","required":true,"schema":{"type":"string","title":"Region Id"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/RegionUpdate"}}}},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/RegionResponse"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}},"delete":{"tags":["Regions"],"summary":"Delete a region","operationId":"delete_region_regions__region_id__delete","security":[{"OAuth2PasswordBearer":[]}],"parameters":[{"name":"region_id","in":"path","required":true,"schema":{"type":"string","title":"Region Id"}}],"responses":{"204":{"description":"Successful Response"},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/affordability/{region_name}":{"get":{"tags":["Analytics"],"summary":"Housing affordability metrics for a region","operationId":"get_affordability_affordability__region_name__get","parameters":[{"name":"region_name","in":"path","required":true,"schema":{"type":"string","title":"Region Name"}}],"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/AffordabilityResponse"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/trends/{region_name}":{"get":{"tags":["Analytics"],"summary":"Year-on-year house price trends for a region","operationId":"get_trends_trends__region_name__get","parameters":[{"name":"region_name","in":"path","required":true,"schema":{"type":"string","title":"Region Name"}}],"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/TrendsResponse"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/rent-to-buy/{region_name}":{"get":{"tags":["Analytics"],"summary":"Rent-vs-buy comparison for a region","description":"Compares estimated monthly mortgage cost against median rent, and estimates\nhow many months a median-salary earner would need to save a 10% deposit.\n\nMortgage assumptions: 10% deposit, 4.5% p.a. interest (approx. Bank of England\nbase rate + typical lender margin), 25-year repayment term.","operationId":"get_rent_to_buy_rent_to_buy__region_name__get","parameters":[{"name":"region_name","in":"path","required":true,"schema":{"type":"string","title":"Region Name"}}],"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/RentToBuyResponse"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/search":{"get":{"tags":["Intelligence"],"summary":"Semantic search over property listings","operationId":"search_listings_search_get","parameters":[{"name":"q","in":"query","required":true,"schema":{"type":"string","minLength":3,"description":"Natural language search query, e.g. 'affordable flat in London'","title":"Q"},"description":"Natural language search query, e.g. 'affordable flat in London'"},{"name":"limit","in":"query","required":false,"schema":{"type":"integer","maximum":50,"description":"Maximum number of results","default":10,"title":"Limit"},"description":"Maximum number of results"},{"name":"region","in":"query","required":false,"schema":{"anyOf":[{"type":"string"},{"type":"null"}],"description":"Optional region filter","title":"Region"},"description":"Optional region filter"}],"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/SearchResponse"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/insights/{region_name}":{"get":{"tags":["Intelligence"],"summary":"AI-generated housing market intelligence for a region","operationId":"get_insights_insights__region_name__get","parameters":[{"name":"region_name","in":"path","required":true,"schema":{"type":"string","title":"Region Name"}}],"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/InsightsResponse"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}}},"components":{"schemas":{"AffordabilityResponse":{"properties":{"region":{"type":"string","title":"Region"},"ons_code":{"type":"string","title":"Ons Code"},"year":{"type":"integer","title":"Year"},"median_salary":{"type":"number","title":"Median Salary"},"median_rent_monthly":{"type":"number","title":"Median Rent Monthly"},"median_house_price":{"type":"number","title":"Median House Price"},"price_to_income_ratio":{"type":"number","title":"Price To Income Ratio"},"rent_to_income_pct":{"type":"number","title":"Rent To Income Pct"},"affordability_band":{"type":"string","title":"Affordability Band"}},"type":"object","required":["region","ons_code","year","median_salary","median_rent_monthly","median_house_price","price_to_income_ratio","rent_to_income_pct","affordability_band"],"title":"AffordabilityResponse"},"Body_login_for_access_token_token_post":{"properties":{"grant_type":{"anyOf":[{"type":"string","pattern":"password"},{"type":"null"}],"title":"Grant Type"},"username":{"type":"string","title":"Username"},"password":{"type":"string","title":"Password"},"scope":{"type":"string","title":"Scope","default":""},"client_id":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Client Id"},"client_secret":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Client Secret"}},"type":"object","required":["username","password"],"title":"Body_login_for_access_token_token_post"},"HTTPValidationError":{"properties":{"detail":{"items":{"$ref":"#/components/schemas/ValidationError"},"type":"array","title":"Detail"}},"type":"object","title":"HTTPValidationError"},"InsightsResponse":{"properties":{"region":{"type":"string","title":"Region"},"insight":{"type":"string","title":"Insight"},"data_used":{"additionalProperties":true,"type":"object","title":"Data Used"},"powered_by":{"type":"string","title":"Powered By"}},"type":"object","required":["region","insight","data_used","powered_by"],"title":"InsightsResponse"},"ListingCreate":{"properties":{"address":{"type":"string","title":"Address","description":"Full property address"},"region":{"type":"string","title":"Region","description":"ONS region name"},"price":{"type":"integer","title":"Price","description":"Sale price in GBP"},"bedrooms":{"anyOf":[{"type":"integer"},{"type":"null"}],"title":"Bedrooms","description":"Number of bedrooms"},"property_type":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Property Type","description":"e.g. detached, semi, terraced, flat"},"transaction_date":{"type":"string","format":"date","title":"Transaction Date","description":"Date the transaction completed"}},"type":"object","required":["address","region","price","transaction_date"],"title":"ListingCreate"},"ListingResponse":{"properties":{"address":{"type":"string","title":"Address","description":"Full property address"},"region":{"type":"string","title":"Region","description":"ONS region name"},"price":{"type":"integer","title":"Price","description":"Sale price in GBP"},"bedrooms":{"anyOf":[{"type":"integer"},{"type":"null"}],"title":"Bedrooms","description":"Number of bedrooms"},"property_type":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Property Type","description":"e.g. detached, semi, terraced, flat"},"transaction_date":{"type":"string","format":"date","title":"Transaction Date","description":"Date the transaction completed"},"id":{"type":"string","title":"Id"},"created_at":{"type":"string","format":"date-time","title":"Created At"}},"type":"object","required":["address","region","price","transaction_date","id","created_at"],"title":"ListingResponse"},"ListingUpdate":{"properties":{"address":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Address"},"region":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Region"},"price":{"anyOf":[{"type":"integer"},{"type":"null"}],"title":"Price"},"bedrooms":{"anyOf":[{"type":"integer"},{"type":"null"}],"title":"Bedrooms"},"property_type":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Property Type"},"transaction_date":{"anyOf":[{"type":"string","format":"date"},{"type":"null"}],"title":"Transaction Date"}},"type":"object","title":"ListingUpdate"},"RegionCreate":{"properties":{"name":{"type":"string","title":"Name","description":"Region name"},"ons_code":{"type":"string","title":"Ons Code","description":"ONS area code"},"median_salary":{"anyOf":[{"type":"number"},{"type":"null"}],"title":"Median Salary","description":"Median salary in GBP/year from ONS ASHE"},"median_rent":{"anyOf":[{"type":"number"},{"type":"null"}],"title":"Median Rent","description":"Median rent in GBP/month from ONS PRS"},"year":{"type":"integer","title":"Year","description":"Data year"}},"type":"object","required":["name","ons_code","year"],"title":"RegionCreate"},"RegionResponse":{"properties":{"name":{"type":"string","title":"Name","description":"Region name"},"ons_code":{"type":"string","title":"Ons Code","description":"ONS area code"},"median_salary":{"anyOf":[{"type":"number"},{"type":"null"}],"title":"Median Salary","description":"Median salary in GBP/year from ONS ASHE"},"median_rent":{"anyOf":[{"type":"number"},{"type":"null"}],"title":"Median Rent","description":"Median rent in GBP/month from ONS PRS"},"year":{"type":"integer","title":"Year","description":"Data year"},"id":{"type":"string","title":"Id"}},"type":"object","required":["name","ons_code","year","id"],"title":"RegionResponse"},"RegionUpdate":{"properties":{"name":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Name"},"ons_code":{"anyOf":[{"type":"string"},{"type":"null"}],"title":"Ons Code"},"median_salary":{"anyOf":[{"type":"number"},{"type":"null"}],"title":"Median Salary"},"median_rent":{"anyOf":[{"type":"number"},{"type":"null"}],"title":"Median Rent"},"year":{"anyOf":[{"type":"integer"},{"type":"null"}],"title":"Year"}},"type":"object","title":"RegionUpdate"},"RentToBuyResponse":{"properties":{"region":{"type":"string","title":"Region"},"median_house_price":{"type":"number","title":"Median House Price"},"monthly_mortgage_estimate":{"type":"number","title":"Monthly Mortgage Estimate"},"monthly_rent":{"type":"number","title":"Monthly Rent"},"monthly_saving_vs_renting":{"type":"number","title":"Monthly Saving Vs Renting"},"deposit_10pct":{"type":"number","title":"Deposit 10Pct"},"months_to_save_deposit":{"type":"number","title":"Months To Save Deposit"},"years_to_save_deposit":{"type":"number","title":"Years To Save Deposit"},"verdict":{"type":"string","title":"Verdict"}},"type":"object","required":["region","median_house_price","monthly_mortgage_estimate","monthly_rent","monthly_saving_vs_renting","deposit_10pct","months_to_save_deposit","years_to_save_deposit","verdict"],"title":"RentToBuyResponse"},"SearchResponse":{"properties":{"query":{"type":"string","title":"Query"},"results":{"items":{"$ref":"#/components/schemas/ListingResponse"},"type":"array","title":"Results"},"count":{"type":"integer","title":"Count"}},"type":"object","required":["query","results","count"],"title":"SearchResponse"},"TrendsResponse":{"properties":{"region":{"type":"string","title":"Region"},"data_from":{"type":"integer","title":"Data From"},"data_to":{"type":"integer","title":"Data To"},"yearly_data":{"items":{"$ref":"#/components/schemas/YearlyPoint"},"type":"array","title":"Yearly Data"},"total_change_pct":{"type":"number","title":"Total Change Pct"},"cagr_pct":{"type":"number","title":"Cagr Pct"}},"type":"object","required":["region","data_from","data_to","yearly_data","total_change_pct","cagr_pct"],"title":"TrendsResponse"},"ValidationError":{"properties":{"loc":{"items":{"anyOf":[{"type":"string"},{"type":"integer"}]},"type":"array","title":"Location"},"msg":{"type":"string","title":"Message"},"type":{"type":"string","title":"Error Type"}},"type":"object","required":["loc","msg","type"],"title":"ValidationError"},"YearlyPoint":{"properties":{"year":{"type":"integer","title":"Year"},"median_price":{"type":"number","title":"Median Price"},"transaction_count":{"type":"integer","title":"Transaction Count"}},"type":"object","required":["year","median_price","transaction_count"],"title":"YearlyPoint"}},"securitySchemes":{"OAuth2PasswordBearer":{"type":"oauth2","flows":{"password":{"scopes":{},"tokenUrl":"token"}}}}}}
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "UK Housing Affordability Intelligence API",
+        "description": "Combines HM Land Registry Price Paid Data, ONS Annual Survey of Hours and Earnings, and ONS Private Rental Market Summary to provide affordability insights across UK regions.",
+        "contact": {
+            "name": "COMP3011 Coursework",
+            "url": "https://github.com/AlexJGeorge1/COMP3011-housing-api"
+        },
+        "license": {
+            "name": "MIT"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/health": {
+            "get": {
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Service health check",
+                "description": "Verifies that the API service is currently running and responsive.",
+                "operationId": "health_check_health_get",
+                "responses": {
+                    "200": {
+                        "description": "API is healthy and running.",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "status": "ok",
+                                    "version": "1.0.0"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/token": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Obtain a JWT access token",
+                "description": "Authenticates a user and returns a JSON Web Token (JWT) for accessing secured endpoints.",
+                "operationId": "login_for_access_token_token_post",
+                "requestBody": {
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Body_login_for_access_token_token_post"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successfully authenticated. Returns the JWT token.",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "access_token": "eyJhbGciOiJIUzI1NiIsInR5c...",
+                                    "token_type": "bearer"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Incorrect username or password."
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/listings": {
+            "get": {
+                "tags": [
+                    "Listings"
+                ],
+                "summary": "List all property listings",
+                "description": "Retrieve a paginated list of property listings. Optionally filter by region name.",
+                "operationId": "get_listings_listings_get",
+                "parameters": [
+                    {
+                        "name": "region",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "description": "Filter by region name (case-insensitive partial match)",
+                            "examples": [
+                                "London"
+                            ],
+                            "title": "Region"
+                        },
+                        "description": "Filter by region name (case-insensitive partial match)"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 500,
+                            "minimum": 1,
+                            "description": "Maximum number of results to return",
+                            "examples": [
+                                50
+                            ],
+                            "default": 100,
+                            "title": "Limit"
+                        },
+                        "description": "Maximum number of results to return"
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "Number of results to skip (for pagination)",
+                            "examples": [
+                                0
+                            ],
+                            "default": 0,
+                            "title": "Offset"
+                        },
+                        "description": "Number of results to skip (for pagination)"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ListingResponse"
+                                    },
+                                    "title": "Response Get Listings Listings Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Listings"
+                ],
+                "summary": "Create a new listing",
+                "description": "Creates a new property transaction listing in the database. Requires JWT authentication.",
+                "operationId": "create_listing_listings_post",
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ListingCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "The newly created listing.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ListingResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Valid JWT token required."
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/listings/{listing_id}": {
+            "get": {
+                "tags": [
+                    "Listings"
+                ],
+                "summary": "Get a single listing by ID",
+                "description": "Retrieves the details of a specific property listing using its unique identifier.",
+                "operationId": "get_listing_listings__listing_id__get",
+                "parameters": [
+                    {
+                        "name": "listing_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "The UUID of the listing to retrieve",
+                            "examples": [
+                                "123e4567-e89b-12d3-a456-426614174000"
+                            ],
+                            "title": "Listing Id"
+                        },
+                        "description": "The UUID of the listing to retrieve"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ListingResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Listing not found"
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Listings"
+                ],
+                "summary": "Update a listing",
+                "description": "Updates the fields of an existing property listing. Requires JWT authentication.",
+                "operationId": "update_listing_listings__listing_id__put",
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "listing_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "The UUID of the listing to update",
+                            "examples": [
+                                "123e4567-e89b-12d3-a456-426614174000"
+                            ],
+                            "title": "Listing Id"
+                        },
+                        "description": "The UUID of the listing to update"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ListingUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The updated listing.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ListingResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Valid JWT token required."
+                    },
+                    "404": {
+                        "description": "Listing not found."
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Listings"
+                ],
+                "summary": "Delete a listing",
+                "description": "Deletes a property listing from the database. Requires JWT authentication.",
+                "operationId": "delete_listing_listings__listing_id__delete",
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "listing_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "The UUID of the listing to delete",
+                            "examples": [
+                                "123e4567-e89b-12d3-a456-426614174000"
+                            ],
+                            "title": "Listing Id"
+                        },
+                        "description": "The UUID of the listing to delete"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Listing successfully deleted."
+                    },
+                    "401": {
+                        "description": "Unauthorized - Valid JWT token required."
+                    },
+                    "404": {
+                        "description": "Listing not found."
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/regions": {
+            "get": {
+                "tags": [
+                    "Regions"
+                ],
+                "summary": "List all regions",
+                "description": "Retrieve all UK regions stored in the database.\n\nReturns a list of regions, including their names, ONS codes, and aggregated economic data \n(median salary and median rent) if available.",
+                "operationId": "get_regions_regions_get",
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved list of regions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/RegionResponse"
+                                    },
+                                    "type": "array",
+                                    "title": "Response Get Regions Regions Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Regions"
+                ],
+                "summary": "Create a new region",
+                "description": "Create a new region record.\n\nRequires JWT authentication.\n\n- **region_in**: The region data to create.",
+                "operationId": "create_region_regions_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegionCreate"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Region successfully created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RegionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Valid JWT token required"
+                    },
+                    "409": {
+                        "description": "Conflict - Region with this name already exists"
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ]
+            }
+        },
+        "/regions/{region_id}": {
+            "get": {
+                "tags": [
+                    "Regions"
+                ],
+                "summary": "Get a single region by ID",
+                "description": "Retrieve a single region by its unique UUID.\n\n- **region_id**: The UUID of the region to retrieve.",
+                "operationId": "get_region_regions__region_id__get",
+                "parameters": [
+                    {
+                        "name": "region_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Region Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved the region",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RegionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Region not found"
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Regions"
+                ],
+                "summary": "Update a region",
+                "description": "Update an existing region record.\n\nRequires JWT authentication. Only the fields provided in the request will be updated.\n\n- **region_id**: The UUID of the region to update.\n- **region_in**: The updated region data.",
+                "operationId": "update_region_regions__region_id__put",
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "region_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Region Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegionUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Region successfully updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RegionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Valid JWT token required"
+                    },
+                    "404": {
+                        "description": "Region not found"
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Regions"
+                ],
+                "summary": "Delete a region",
+                "description": "Permanently delete a region.\n\nRequires JWT authentication.\n\n- **region_id**: The UUID of the region to delete.",
+                "operationId": "delete_region_regions__region_id__delete",
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "region_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Region Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Region successfully deleted"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Valid JWT token required"
+                    },
+                    "404": {
+                        "description": "Region not found"
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/affordability/{region_name}": {
+            "get": {
+                "tags": [
+                    "Analytics"
+                ],
+                "summary": "Housing affordability metrics for a region",
+                "description": "Retrieve derived housing affordability metrics for a specific UK region.\n\n- **region_name**: The name of the region to query (e.g., \"London\").",
+                "operationId": "get_affordability_affordability__region_name__get",
+                "parameters": [
+                    {
+                        "name": "region_name",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Region Name"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AffordabilityResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/trends/{region_name}": {
+            "get": {
+                "tags": [
+                    "Analytics"
+                ],
+                "summary": "Year-on-year house price trends for a region",
+                "description": "Calculate year-on-year house price trends for a specific region.\n\nRetrieves median house prices and transaction counts for each year available\nin the database for the given region. Calculates total percentage change\nand the Compound Annual Growth Rate (CAGR).\n\n- **region_name**: Name of the region to analyze (e.g., \"London\").\n- **db**: Database session dependency.\n\nReturns a breakdown of yearly median prices and transaction volumes, along with calculated growth metrics.",
+                "operationId": "get_trends_trends__region_name__get",
+                "parameters": [
+                    {
+                        "name": "region_name",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Region Name"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved trends",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TrendsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Region not found or no listing data available for the region"
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/rent-to-buy/{region_name}": {
+            "get": {
+                "tags": [
+                    "Analytics"
+                ],
+                "summary": "Rent-vs-buy comparison for a region",
+                "description": "Compares estimated monthly mortgage cost against median rent, and estimates\nhow many months a median-salary earner would need to save a deposit.\n\nMortgage assumptions can be customized via query parameters, but default to:\n- 10% deposit\n- 4.5% p.a. interest (approx. Bank of England base rate + typical lender margin)\n- 25-year repayment term\n\n- **region_name**: Name of the region to analyze (e.g., \"London\").\n- **deposit_pct**: Deposit percentage as a decimal (default 0.10).\n- **interest_rate**: Annual interest rate percentage (default 4.5).\n- **term_years**: Mortgage term length in years (default 25).\n- **db**: Database session dependency.\n\nReturns a detailed financial comparison and a qualitative verdict on affordability.",
+                "operationId": "get_rent_to_buy_rent_to_buy__region_name__get",
+                "parameters": [
+                    {
+                        "name": "region_name",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Region Name"
+                        }
+                    },
+                    {
+                        "name": "deposit_pct",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "maximum": 0.4,
+                            "minimum": 0.05,
+                            "description": "Deposit as a decimal, e.g. 0.10 for 10%",
+                            "default": 0.1,
+                            "title": "Deposit Pct"
+                        },
+                        "description": "Deposit as a decimal, e.g. 0.10 for 10%"
+                    },
+                    {
+                        "name": "interest_rate",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "maximum": 15.0,
+                            "minimum": 0.1,
+                            "description": "Annual interest rate %",
+                            "default": 4.5,
+                            "title": "Interest Rate"
+                        },
+                        "description": "Annual interest rate %"
+                    },
+                    {
+                        "name": "term_years",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 35,
+                            "minimum": 5,
+                            "description": "Mortgage term in years",
+                            "default": 25,
+                            "title": "Term Years"
+                        },
+                        "description": "Mortgage term in years"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully calculated rent vs buy metrics",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RentToBuyResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Region not found or no listing data available"
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/search": {
+            "get": {
+                "tags": [
+                    "Intelligence"
+                ],
+                "summary": "Semantic search over property listings",
+                "description": "Perform a semantic search over property listings.\n\nExpects a natural language query and uses vector embeddings (pgvector) to find \nthe most relevant property listings based on cosine similarity.\n\n- **q**: The natural language search query string.\n- **limit**: Maximum number of listings to return (default 10, max 50).\n- **region**: Optional filter to restrict search to a specific ONS region.\n- **db**: Database session dependency.\n\nReturns a list of listings matching the query semantically, along with the original query and count.",
+                "operationId": "search_listings_search_get",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "minLength": 3,
+                            "description": "Natural language search query, e.g. 'affordable flat in London'",
+                            "title": "Q"
+                        },
+                        "description": "Natural language search query, e.g. 'affordable flat in London'"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 50,
+                            "description": "Maximum number of results",
+                            "default": 10,
+                            "title": "Limit"
+                        },
+                        "description": "Maximum number of results"
+                    },
+                    {
+                        "name": "region",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "description": "Optional region filter",
+                            "title": "Region"
+                        },
+                        "description": "Optional region filter"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful search",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SearchResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "No embeddings found or validation error"
+                    },
+                    "503": {
+                        "description": "Semantic search unavailable due to missing pgvector extension"
+                    }
+                }
+            }
+        },
+        "/insights/{region_name}": {
+            "get": {
+                "tags": [
+                    "Intelligence"
+                ],
+                "summary": "AI-generated housing market intelligence for a region",
+                "description": "Generate an AI-powered summary of the housing market in a specific region.\n\n- **region_name**: The name of the region to analyze (e.g., \"London\").",
+                "operationId": "get_insights_insights__region_name__get",
+                "parameters": [
+                    {
+                        "name": "region_name",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Region Name"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InsightsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "AffordabilityResponse": {
+                "properties": {
+                    "region": {
+                        "type": "string",
+                        "title": "Region",
+                        "description": "The name of the UK region",
+                        "examples": [
+                            "London"
+                        ]
+                    },
+                    "ons_code": {
+                        "type": "string",
+                        "title": "Ons Code",
+                        "description": "The Office for National Statistics region code",
+                        "examples": [
+                            "E12000007"
+                        ]
+                    },
+                    "year": {
+                        "type": "integer",
+                        "title": "Year",
+                        "description": "The year of the data",
+                        "examples": [
+                            2023
+                        ]
+                    },
+                    "median_salary": {
+                        "type": "number",
+                        "title": "Median Salary",
+                        "description": "The median annual gross salary in GBP",
+                        "examples": [
+                            41893.0
+                        ]
+                    },
+                    "median_rent_monthly": {
+                        "type": "number",
+                        "title": "Median Rent Monthly",
+                        "description": "The median monthly private rent in GBP",
+                        "examples": [
+                            1450.0
+                        ]
+                    },
+                    "median_house_price": {
+                        "type": "number",
+                        "title": "Median House Price",
+                        "description": "The median house sale price in GBP",
+                        "examples": [
+                            515000.0
+                        ]
+                    },
+                    "price_to_income_ratio": {
+                        "type": "number",
+                        "title": "Price To Income Ratio",
+                        "description": "Ratio of median house price to median annual salary",
+                        "examples": [
+                            12.29
+                        ]
+                    },
+                    "rent_to_income_pct": {
+                        "type": "number",
+                        "title": "Rent To Income Pct",
+                        "description": "Percentage of annual salary required to pay annual rent",
+                        "examples": [
+                            41.5
+                        ]
+                    },
+                    "affordability_band": {
+                        "type": "string",
+                        "title": "Affordability Band",
+                        "description": "Categorical classification of affordability based on price-to-income ratio",
+                        "examples": [
+                            "severely unaffordable"
+                        ]
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "region",
+                    "ons_code",
+                    "year",
+                    "median_salary",
+                    "median_rent_monthly",
+                    "median_house_price",
+                    "price_to_income_ratio",
+                    "rent_to_income_pct",
+                    "affordability_band"
+                ],
+                "title": "AffordabilityResponse",
+                "description": "Response schema containing derived housing affordability metrics for a region."
+            },
+            "Body_login_for_access_token_token_post": {
+                "properties": {
+                    "grant_type": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "pattern": "password"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Grant Type"
+                    },
+                    "username": {
+                        "type": "string",
+                        "title": "Username"
+                    },
+                    "password": {
+                        "type": "string",
+                        "title": "Password"
+                    },
+                    "scope": {
+                        "type": "string",
+                        "title": "Scope",
+                        "default": ""
+                    },
+                    "client_id": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Client Id"
+                    },
+                    "client_secret": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Client Secret"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "username",
+                    "password"
+                ],
+                "title": "Body_login_for_access_token_token_post"
+            },
+            "HTTPValidationError": {
+                "properties": {
+                    "detail": {
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        },
+                        "type": "array",
+                        "title": "Detail"
+                    }
+                },
+                "type": "object",
+                "title": "HTTPValidationError"
+            },
+            "InsightsResponse": {
+                "properties": {
+                    "region": {
+                        "type": "string",
+                        "title": "Region",
+                        "description": "The name of the region analyzed",
+                        "examples": [
+                            "London"
+                        ]
+                    },
+                    "insight": {
+                        "type": "string",
+                        "title": "Insight",
+                        "description": "The AI-generated insight text, or an error/fallback message",
+                        "examples": [
+                            "Housing in London remains severely unaffordable for first-time buyers."
+                        ]
+                    },
+                    "data_used": {
+                        "additionalProperties": true,
+                        "type": "object",
+                        "title": "Data Used",
+                        "description": "A dictionary of the actual metrics used to prompt the AI model",
+                        "examples": [
+                            {
+                                "median_house_price": 500000,
+                                "median_salary": 40000,
+                                "price_to_income_ratio": 12.5
+                            }
+                        ]
+                    },
+                    "powered_by": {
+                        "type": "string",
+                        "title": "Powered By",
+                        "description": "Identifies the LLM used, or 'error'/'fallback' if the call failed",
+                        "examples": [
+                            "llama-3.1-8b-instant (Groq)"
+                        ]
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "region",
+                    "insight",
+                    "data_used",
+                    "powered_by"
+                ],
+                "title": "InsightsResponse",
+                "description": "Response schema containing AI-generated intelligence about a region's housing market."
+            },
+            "ListingCreate": {
+                "properties": {
+                    "address": {
+                        "type": "string",
+                        "title": "Address",
+                        "description": "Full property address",
+                        "examples": [
+                            "10 Downing Street, London"
+                        ]
+                    },
+                    "region": {
+                        "type": "string",
+                        "title": "Region",
+                        "description": "ONS region name",
+                        "examples": [
+                            "London"
+                        ]
+                    },
+                    "price": {
+                        "type": "integer",
+                        "title": "Price",
+                        "description": "Sale price in GBP",
+                        "examples": [
+                            1500000
+                        ]
+                    },
+                    "bedrooms": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Bedrooms",
+                        "description": "Number of bedrooms",
+                        "examples": [
+                            3
+                        ]
+                    },
+                    "property_type": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Property Type",
+                        "description": "e.g. detached, semi, terraced, flat",
+                        "examples": [
+                            "terraced"
+                        ]
+                    },
+                    "transaction_date": {
+                        "type": "string",
+                        "format": "date",
+                        "title": "Transaction Date",
+                        "description": "Date the transaction completed",
+                        "examples": [
+                            "2024-01-15"
+                        ]
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "address",
+                    "region",
+                    "price",
+                    "transaction_date"
+                ],
+                "title": "ListingCreate",
+                "description": "Schema for creating a new property listing."
+            },
+            "ListingResponse": {
+                "properties": {
+                    "address": {
+                        "type": "string",
+                        "title": "Address",
+                        "description": "Full property address",
+                        "examples": [
+                            "10 Downing Street, London"
+                        ]
+                    },
+                    "region": {
+                        "type": "string",
+                        "title": "Region",
+                        "description": "ONS region name",
+                        "examples": [
+                            "London"
+                        ]
+                    },
+                    "price": {
+                        "type": "integer",
+                        "title": "Price",
+                        "description": "Sale price in GBP",
+                        "examples": [
+                            1500000
+                        ]
+                    },
+                    "bedrooms": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Bedrooms",
+                        "description": "Number of bedrooms",
+                        "examples": [
+                            3
+                        ]
+                    },
+                    "property_type": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Property Type",
+                        "description": "e.g. detached, semi, terraced, flat",
+                        "examples": [
+                            "terraced"
+                        ]
+                    },
+                    "transaction_date": {
+                        "type": "string",
+                        "format": "date",
+                        "title": "Transaction Date",
+                        "description": "Date the transaction completed",
+                        "examples": [
+                            "2024-01-15"
+                        ]
+                    },
+                    "id": {
+                        "type": "string",
+                        "title": "Id",
+                        "description": "Unique identifier for the listing",
+                        "examples": [
+                            "123e4567-e89b-12d3-a456-426614174000"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Created At",
+                        "description": "Timestamp of when the listing was created",
+                        "examples": [
+                            "2024-03-01T12:00:00Z"
+                        ]
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "address",
+                    "region",
+                    "price",
+                    "transaction_date",
+                    "id",
+                    "created_at"
+                ],
+                "title": "ListingResponse",
+                "description": "Schema for returning a property listing."
+            },
+            "ListingUpdate": {
+                "properties": {
+                    "address": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Address",
+                        "description": "Full property address",
+                        "examples": [
+                            "10 Downing Street, London"
+                        ]
+                    },
+                    "region": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Region",
+                        "description": "ONS region name",
+                        "examples": [
+                            "London"
+                        ]
+                    },
+                    "price": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Price",
+                        "description": "Sale price in GBP",
+                        "examples": [
+                            1550000
+                        ]
+                    },
+                    "bedrooms": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Bedrooms",
+                        "description": "Number of bedrooms",
+                        "examples": [
+                            4
+                        ]
+                    },
+                    "property_type": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Property Type",
+                        "description": "e.g. detached, semi, terraced, flat",
+                        "examples": [
+                            "terraced"
+                        ]
+                    },
+                    "transaction_date": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Transaction Date",
+                        "description": "Date the transaction completed",
+                        "examples": [
+                            "2024-02-20"
+                        ]
+                    }
+                },
+                "type": "object",
+                "title": "ListingUpdate",
+                "description": "Schema for updating an existing property listing. All fields are optional."
+            },
+            "RegionCreate": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "description": "Region name",
+                        "examples": [
+                            "London"
+                        ]
+                    },
+                    "ons_code": {
+                        "type": "string",
+                        "title": "Ons Code",
+                        "description": "ONS area code",
+                        "examples": [
+                            "E12000007"
+                        ]
+                    },
+                    "median_salary": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Median Salary",
+                        "description": "Median salary in GBP/year from ONS ASHE",
+                        "examples": [
+                            45000.0
+                        ]
+                    },
+                    "median_rent": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Median Rent",
+                        "description": "Median rent in GBP/month from ONS PRS",
+                        "examples": [
+                            1800.0
+                        ]
+                    },
+                    "year": {
+                        "type": "integer",
+                        "title": "Year",
+                        "description": "Data year",
+                        "examples": [
+                            2023
+                        ]
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name",
+                    "ons_code",
+                    "year"
+                ],
+                "title": "RegionCreate",
+                "description": "Schema for creating a new region record."
+            },
+            "RegionResponse": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "Name",
+                        "description": "Region name",
+                        "examples": [
+                            "London"
+                        ]
+                    },
+                    "ons_code": {
+                        "type": "string",
+                        "title": "Ons Code",
+                        "description": "ONS area code",
+                        "examples": [
+                            "E12000007"
+                        ]
+                    },
+                    "median_salary": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Median Salary",
+                        "description": "Median salary in GBP/year from ONS ASHE",
+                        "examples": [
+                            45000.0
+                        ]
+                    },
+                    "median_rent": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Median Rent",
+                        "description": "Median rent in GBP/month from ONS PRS",
+                        "examples": [
+                            1800.0
+                        ]
+                    },
+                    "year": {
+                        "type": "integer",
+                        "title": "Year",
+                        "description": "Data year",
+                        "examples": [
+                            2023
+                        ]
+                    },
+                    "id": {
+                        "type": "string",
+                        "title": "Id",
+                        "description": "Unique identifier for the region record",
+                        "examples": [
+                            "550e8400-e29b-41d4-a716-446655440000"
+                        ]
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name",
+                    "ons_code",
+                    "year",
+                    "id"
+                ],
+                "title": "RegionResponse",
+                "description": "Schema for returning a region record."
+            },
+            "RegionUpdate": {
+                "properties": {
+                    "name": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Name",
+                        "description": "Region name",
+                        "examples": [
+                            "London"
+                        ]
+                    },
+                    "ons_code": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Ons Code",
+                        "description": "ONS area code",
+                        "examples": [
+                            "E12000007"
+                        ]
+                    },
+                    "median_salary": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Median Salary",
+                        "description": "Median salary in GBP/year from ONS ASHE",
+                        "examples": [
+                            46000.0
+                        ]
+                    },
+                    "median_rent": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Median Rent",
+                        "description": "Median rent in GBP/month from ONS PRS",
+                        "examples": [
+                            1850.0
+                        ]
+                    },
+                    "year": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Year",
+                        "description": "Data year",
+                        "examples": [
+                            2024
+                        ]
+                    }
+                },
+                "type": "object",
+                "title": "RegionUpdate",
+                "description": "Schema for updating an existing region record."
+            },
+            "RentToBuyResponse": {
+                "properties": {
+                    "region": {
+                        "type": "string",
+                        "title": "Region",
+                        "description": "Name of the region",
+                        "examples": [
+                            "London"
+                        ]
+                    },
+                    "median_house_price": {
+                        "type": "number",
+                        "title": "Median House Price",
+                        "description": "Median house price in the region",
+                        "examples": [
+                            500000.0
+                        ]
+                    },
+                    "monthly_mortgage_estimate": {
+                        "type": "number",
+                        "title": "Monthly Mortgage Estimate",
+                        "description": "Estimated monthly mortgage payment",
+                        "examples": [
+                            2000.0
+                        ]
+                    },
+                    "monthly_rent": {
+                        "type": "number",
+                        "title": "Monthly Rent",
+                        "description": "Median monthly rent in the region",
+                        "examples": [
+                            1800.0
+                        ]
+                    },
+                    "monthly_saving_vs_renting": {
+                        "type": "number",
+                        "title": "Monthly Saving Vs Renting",
+                        "description": "Monthly savings of buying vs renting",
+                        "examples": [
+                            -200.0
+                        ]
+                    },
+                    "deposit_10pct": {
+                        "type": "number",
+                        "title": "Deposit 10Pct",
+                        "description": "Calculated deposit amount",
+                        "examples": [
+                            50000.0
+                        ]
+                    },
+                    "months_to_save_deposit": {
+                        "type": "number",
+                        "title": "Months To Save Deposit",
+                        "description": "Estimated months to save the deposit",
+                        "examples": [
+                            60.0
+                        ]
+                    },
+                    "years_to_save_deposit": {
+                        "type": "number",
+                        "title": "Years To Save Deposit",
+                        "description": "Estimated years to save the deposit",
+                        "examples": [
+                            5.0
+                        ]
+                    },
+                    "verdict": {
+                        "type": "string",
+                        "title": "Verdict",
+                        "description": "Textual verdict of the analysis",
+                        "examples": [
+                            "Mortgage costs less than rent."
+                        ]
+                    },
+                    "deposit_pct": {
+                        "type": "number",
+                        "title": "Deposit Pct",
+                        "description": "Deposit percentage used in calculation",
+                        "examples": [
+                            0.1
+                        ]
+                    },
+                    "interest_rate": {
+                        "type": "number",
+                        "title": "Interest Rate",
+                        "description": "Annual interest rate used in calculation",
+                        "examples": [
+                            4.5
+                        ]
+                    },
+                    "term_years": {
+                        "type": "integer",
+                        "title": "Term Years",
+                        "description": "Mortgage term in years used in calculation",
+                        "examples": [
+                            25
+                        ]
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "region",
+                    "median_house_price",
+                    "monthly_mortgage_estimate",
+                    "monthly_rent",
+                    "monthly_saving_vs_renting",
+                    "deposit_10pct",
+                    "months_to_save_deposit",
+                    "years_to_save_deposit",
+                    "verdict",
+                    "deposit_pct",
+                    "interest_rate",
+                    "term_years"
+                ],
+                "title": "RentToBuyResponse",
+                "description": "Schema for returning rent vs buy comparison metrics."
+            },
+            "SearchResponse": {
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "title": "Query",
+                        "description": "The original search query",
+                        "examples": [
+                            "affordable flat in London"
+                        ]
+                    },
+                    "results": {
+                        "items": {
+                            "$ref": "#/components/schemas/ListingResponse"
+                        },
+                        "type": "array",
+                        "title": "Results",
+                        "description": "List of matching property listings"
+                    },
+                    "count": {
+                        "type": "integer",
+                        "title": "Count",
+                        "description": "Number of results returned",
+                        "examples": [
+                            10
+                        ]
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "query",
+                    "results",
+                    "count"
+                ],
+                "title": "SearchResponse",
+                "description": "Schema for the semantic search response."
+            },
+            "TrendsResponse": {
+                "properties": {
+                    "region": {
+                        "type": "string",
+                        "title": "Region",
+                        "description": "Name of the region",
+                        "examples": [
+                            "London"
+                        ]
+                    },
+                    "data_from": {
+                        "type": "integer",
+                        "title": "Data From",
+                        "description": "Start year of the trend data",
+                        "examples": [
+                            2010
+                        ]
+                    },
+                    "data_to": {
+                        "type": "integer",
+                        "title": "Data To",
+                        "description": "End year of the trend data",
+                        "examples": [
+                            2023
+                        ]
+                    },
+                    "yearly_data": {
+                        "items": {
+                            "$ref": "#/components/schemas/YearlyPoint"
+                        },
+                        "type": "array",
+                        "title": "Yearly Data",
+                        "description": "List of yearly data points"
+                    },
+                    "total_change_pct": {
+                        "type": "number",
+                        "title": "Total Change Pct",
+                        "description": "Total percentage change in median price over the period",
+                        "examples": [
+                            50.5
+                        ]
+                    },
+                    "cagr_pct": {
+                        "type": "number",
+                        "title": "Cagr Pct",
+                        "description": "Compound Annual Growth Rate percentage",
+                        "examples": [
+                            3.2
+                        ]
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "region",
+                    "data_from",
+                    "data_to",
+                    "yearly_data",
+                    "total_change_pct",
+                    "cagr_pct"
+                ],
+                "title": "TrendsResponse",
+                "description": "Schema for returning year-on-year house price trends."
+            },
+            "ValidationError": {
+                "properties": {
+                    "loc": {
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
+                        },
+                        "type": "array",
+                        "title": "Location"
+                    },
+                    "msg": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Error Type"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "title": "ValidationError"
+            },
+            "YearlyPoint": {
+                "properties": {
+                    "year": {
+                        "type": "integer",
+                        "title": "Year",
+                        "description": "The year of the data point",
+                        "examples": [
+                            2023
+                        ]
+                    },
+                    "median_price": {
+                        "type": "number",
+                        "title": "Median Price",
+                        "description": "Median property price in GBP for the year",
+                        "examples": [
+                            250000.0
+                        ]
+                    },
+                    "transaction_count": {
+                        "type": "integer",
+                        "title": "Transaction Count",
+                        "description": "Number of recorded transactions in the year",
+                        "examples": [
+                            1500
+                        ]
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "year",
+                    "median_price",
+                    "transaction_count"
+                ],
+                "title": "YearlyPoint",
+                "description": "Schema representing median price and transaction count for a specific year."
+            }
+        },
+        "securitySchemes": {
+            "OAuth2PasswordBearer": {
+                "type": "oauth2",
+                "flows": {
+                    "password": {
+                        "scopes": {},
+                        "tokenUrl": "token"
+                    }
+                }
+            }
+        }
+    }
+}

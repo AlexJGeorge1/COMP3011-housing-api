@@ -3,8 +3,8 @@
 ## Live API Demo 🚀
 The API is fully deployed and accessible in the cloud. You can interact with it and test all endpoints directly through the browser without needing to install any code locally:
 
-👉 **[Live Interactive Documentation (Swagger UI)](https://housing-api-d2jt.onrender.com/docs)**
-👉 **[Live Health Check](https://housing-api-d2jt.onrender.com/health)**
+**[Live Interactive Documentation (Swagger UI)](https://housing-api-d2jt.onrender.com/docs)**
+**[Live Health Check](https://housing-api-d2jt.onrender.com/health)**
 
 *(Note: Hosted on Render's free tier, so it may take ~30 seconds to wake up if it has been idle).*
 
@@ -24,7 +24,7 @@ The API is built using **Python** and **FastAPI**, with **PostgreSQL** as the pr
 
 ## API Documentation
 The complete API documentation, detailing all available endpoints, parameters, request/response formats, error codes, and the authentication process, is available as a PDF in the `docs` directory:
-👉 **[View API Documentation (PDF)](docs/API_Documentation.pdf)**
+**[View API Documentation (PDF)](docs/API_Documentation.pdf)**
 
 ---
 
@@ -102,3 +102,16 @@ pytest
 
 ## Deployment
 The API is configured to be deployed as a Docker web service. A `render.yaml` and `Dockerfile` are included for seamless deployment to platforms like Render.
+
+## 🤖 AI-Native Access (MCP Server)
+The project includes an **MCP (Model Context Protocol)** server in `mcp_server.py` that exposes API functionality directly to AI assistants.
+
+### Running the MCP Server
+1. Ensure your core API is running (e.g., `uvicorn app.main:app`).
+2. Run the MCP server with the **MCP Inspector** for testing:
+   ```bash
+   source .venv/bin/activate
+   npx @modelcontextprotocol/inspector python mcp_server.py
+   ```
+   Open the printed URL (usually `http://localhost:5173`) in your browser to test endpoints visually using a nice UI interface dashboard easily.
+
